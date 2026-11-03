@@ -1,13 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Hola, {{ auth()->user()->name }}
+            Panel de coordinación
         </h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <p class="text-gray-600">Aún no hay novedades. Te avisamos cuando haya.</p>
+            <a href="{{ route('admin.classrooms.index') }}"
+               class="block rounded-lg bg-white p-6 shadow-sm hover:bg-gray-50">
+                <p class="font-medium">Grupos</p>
+                <p class="text-sm text-gray-500">Crea y organiza los grupos del jardín.</p>
+            </a>
         </div>
     </div>
 </x-app-layout>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +13,7 @@ Route::middleware('auth')->group(function () {
 
     // Punto de entrada único: manda a cada rol a su zona.
     Route::get('/dashboard', function () {
-        return redirect()->route(auth()->user()->role->homeRoute());
+        return redirect()->route(request()->user()->role->homeRoute());
     })->name('dashboard');
 
     // Zona de coordinación
@@ -21,6 +22,10 @@ Route::middleware('auth')->group(function () {
         ->name('admin.')
         ->group(function () {
             Route::view('/', 'admin.dashboard')->name('dashboard');
+            Route::resource('grupos', ClassroomController::class)
+            ->parameters(['grupos' => 'classroom'])
+            ->except(['show'])
+            ->names('classrooms');
         });
 
     // Zona de educadoras (la coordinación también puede entrar)
