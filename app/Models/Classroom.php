@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class Classroom extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['name', 'age_range'];
+
+    // Un grupo tiene muchos niños.
+    // Uso: $classroom->children
+    public function children(): HasMany
+    {
+        return $this->hasMany(Child::class);
+    }
+}
