@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function () {
         ->name('guardian.')
         ->group(function () {
             Route::view('/', 'guardian.dashboard')->name('dashboard');
+            Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
         });
 
     // Perfil: lo comparten todos los roles
