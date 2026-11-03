@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use App\Enums\Role;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -60,5 +62,12 @@ class User extends Authenticatable
     public function hasRole(Role ...$roles): bool
     {
         return in_array($this->role, $roles, true);
+    }
+        // Un acudiente tiene varios niños.
+    public function children(): BelongsToMany
+    {
+        return $this->belongsToMany(Child::class, 'child_guardian')
+            ->withPivot('relationship')
+            ->withTimestamps();
     }
 }
