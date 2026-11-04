@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,5 +34,9 @@ class Child extends Model
         return $this->belongsToMany(User::class, 'child_guardian')
             ->withPivot('relationship')
             ->withTimestamps();
+    }
+        public function dailyReports(): HasMany
+    {
+        return $this->hasMany(DailyReport::class);
     }
 }

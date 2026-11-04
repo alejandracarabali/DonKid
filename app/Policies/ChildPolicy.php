@@ -15,9 +15,7 @@ class ChildPolicy
             // La coordinación ve a todos.
             Role::Admin => true,
 
-            // Pendiente: cuando exista la tabla de grupos por educadora,
-            // se comprobará que el niño sea de SU grupo. Por ahora, no.
-                        // La educadora solo ve a los niños de SUS grupos.
+            // La educadora solo ve a los niños de SUS grupos.
             Role::Educator => $child->classroom_id !== null
                 && $user->classrooms()->whereKey($child->classroom_id)->exists(),
 
