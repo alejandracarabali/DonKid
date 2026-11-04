@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Educator\DailyReportController;
 use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
@@ -56,6 +57,9 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         ->name('educator.')
         ->group(function () {
             Route::view('/', 'educator.dashboard')->name('dashboard');
+            Route::get('/bitacora', [DailyReportController::class, 'index'])->name('reports.index');
+            Route::get('/bitacora/{child}', [DailyReportController::class, 'create'])->name('reports.create');
+            Route::post('/bitacora/{child}', [DailyReportController::class, 'store'])->name('reports.store');
         });
 
     // Zona de familias
