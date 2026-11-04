@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
 use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
@@ -31,6 +32,10 @@ Route::middleware('auth')->group(function () {
             ->parameters(['ninos' => 'child'])
             ->except(['show'])
             ->names('children');
+            Route::resource('familias', GuardianController::class)
+            ->parameters(['familias' => 'guardian'])
+            ->except(['show'])
+            ->names('guardians');
         });
 
     // Zona de educadoras (la coordinación también puede entrar)

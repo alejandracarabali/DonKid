@@ -3,6 +3,7 @@
 use App\Models\Child;
 use App\Models\Classroom;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 // 1. Camino feliz: coordinación crea un niño con grupo.
 it('permite a coordinación crear un niño', function () {
@@ -68,7 +69,7 @@ it('borra los vínculos con acudientes al quitar un niño', function () {
 
     expect(Child::find($nino->id))->toBeNull()
         ->and(User::find($madre->id))->not->toBeNull() // la madre sigue existiendo
-        ->and(\DB::table('child_guardian')->count())->toBe(0);
+        ->and(DB::table('child_guardian')->count())->toBe(0);
 });
 
 // 6. Privacidad: una familia no gestiona niños.
