@@ -10,4 +10,9 @@
             <p class="text-gray-600">Aún no hay novedades. Te avisamos cuando haya.</p>
         </div>
     </div>
+
+    <a href="{{ route('educator.announcements.create') }}"
+        class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
+        Nuevo aviso
+    </a>
 </x-app-layout>
