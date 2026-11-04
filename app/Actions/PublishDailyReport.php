@@ -12,10 +12,12 @@ class PublishDailyReport
     // Una sola fila por niño y día (unique en la BD).
     public function handle(User $educator, Child $child, array $data): DailyReport
     {
-        $report = DailyReport::firstOrNew([
-            'child_id' => $child->id,
-            'report_date' => today()->toDateString(),
-        ]);
+        $report = DailyReport::where('child_id', $child->id)
+            ->whereDate('report_date', today())
+            ->first() ?? new DailyReport([
+                'child_id' => $child->id,
+                'report_date' => today(),
+            ]);
 
         $report->fill($data);
         $report->educator_id = $educator->id;

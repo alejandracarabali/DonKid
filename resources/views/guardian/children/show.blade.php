@@ -10,4 +10,9 @@
             <p class="text-gray-600">Aún no hay novedades de hoy. Te avisamos cuando haya.</p>
         </div>
     </div>
+
+    <a href="{{ route('guardian.reports.index', $child) }}"
+        class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
+        Ver la bitácora
+    </a>
 </x-app-layout>

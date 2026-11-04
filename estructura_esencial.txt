@@ -1,0 +1,51 @@
+Listado de rutas de carpetas para el volumen Windows
+El número de serie del volumen es 3EAD-B2C0
+C:\PROYECTOS\DONKID\APP
++---Actions
++---Enums
++---Http
+|   +---Controllers
+|   |   +---Admin
+|   |   +---Auth
+|   |   +---Educator
+|   |   \---Guardian
+|   +---Middleware
+|   \---Requests
+|       \---Auth
++---Models
++---Policies
++---Providers
+\---View
+    \---Components
+Listado de rutas de carpetas para el volumen Windows
+El número de serie del volumen es 3EAD-B2C0
+C:\PROYECTOS\DONKID\DATABASE
++---factories
++---migrations
+\---seeders
+Listado de rutas de carpetas para el volumen Windows
+El número de serie del volumen es 3EAD-B2C0
+C:\PROYECTOS\DONKID\ROUTES
+No existe ninguna subcarpeta 
+
+Listado de rutas de carpetas para el volumen Windows
+El número de serie del volumen es 3EAD-B2C0
+C:\PROYECTOS\DONKID\RESOURCES
++---css
++---js
+\---views
+    +---admin
+    |   +---children
+    |   +---classrooms
+    |   +---educators
+    |   \---guardians
+    +---auth
+    +---components
+    +---educator
+    |   \---reports
+    +---guardian
+    |   +---children
+    |   \---reports
+    +---layouts
+    \---profile
+        \---partials
