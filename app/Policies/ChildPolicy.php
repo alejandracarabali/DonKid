@@ -17,7 +17,9 @@ class ChildPolicy
 
             // Pendiente: cuando exista la tabla de grupos por educadora,
             // se comprobará que el niño sea de SU grupo. Por ahora, no.
-            Role::Educator => false,
+                        // La educadora solo ve a los niños de SUS grupos.
+            Role::Educator => $child->classroom_id !== null
+                && $user->classrooms()->whereKey($child->classroom_id)->exists(),
 
             // La familia solo ve a SUS hijos (tabla child_guardian).
             Role::Guardian => $child->guardians()->whereKey($user->id)->exists(),

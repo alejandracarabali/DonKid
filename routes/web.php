@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
 use App\Http\Controllers\Admin\ClassroomController;
@@ -11,7 +12,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Estas rutas quedan FUERA de 'password.changed'; si no, habría un bucle infinito.
 Route::middleware('auth')->group(function () {
+    Route::get('/cambiar-clave', [ForcePasswordController::class, 'edit'])->name('password.force');
+    Route::put('/cambiar-clave', [ForcePasswordController::class, 'update'])->name('password.force.update');
+});
+
+Route::middleware(['auth', 'password.changed'])->group(function () {
 
     // Punto de entrada único: manda a cada rol a su zona.
     Route::get('/dashboard', function () {

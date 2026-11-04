@@ -45,6 +45,7 @@ class GuardianController extends Controller
         // 'role' NO está en $fillable (anti mass assignment), así que se asigna
         // a mano, en código que controlamos nosotros. Nunca viene del formulario.
         $guardian->role = Role::Guardian;
+        $guardian->must_change_password = true;
         $guardian->email_verified_at = now();
         $guardian->save();
 

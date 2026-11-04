@@ -45,5 +45,8 @@ class DatabaseSeeder extends Seeder
             Child::take(2)->pluck('id'),
             ['relationship' => 'Papá']
         );
+                // Laura atiende el grupo Caminadores.
+        $laura = User::where('email', 'laura@donkid.test')->first();
+        $laura->classrooms()->attach(Classroom::where('name', 'Caminadores')->first());
     }
 }

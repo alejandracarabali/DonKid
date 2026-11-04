@@ -54,6 +54,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'must_change_password' => 'boolean',
         ];
     }
         /**
@@ -69,5 +70,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Child::class, 'child_guardian')
             ->withPivot('relationship')
             ->withTimestamps();
+    }
+        // Una educadora atiende varios grupos.
+    public function classrooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Classroom::class, 'classroom_user')->withTimestamps();
     }
 }
