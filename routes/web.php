@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Guardian\DailyReportController as GuardianReportController;
 use App\Http\Controllers\Educator\DailyReportController;
 use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\ForcePasswordController;
@@ -69,6 +70,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         ->group(function () {
             Route::view('/', 'guardian.dashboard')->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
+            Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
         });
 
     // Perfil: lo comparten todos los roles
