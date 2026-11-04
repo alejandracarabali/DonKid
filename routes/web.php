@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Educator\AnnouncementController;
+use App\Http\Controllers\Guardian\AnnouncementController as GuardianAnnouncementController;
 use App\Http\Controllers\Guardian\DailyReportController as GuardianReportController;
 use App\Http\Controllers\Educator\DailyReportController;
 use App\Http\Controllers\Admin\EducatorController;
@@ -61,6 +63,8 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             Route::get('/bitacora', [DailyReportController::class, 'index'])->name('reports.index');
             Route::get('/bitacora/{child}', [DailyReportController::class, 'create'])->name('reports.create');
             Route::post('/bitacora/{child}', [DailyReportController::class, 'store'])->name('reports.store');
+            Route::get('/avisos/crear', [AnnouncementController::class, 'create'])->name('announcements.create');
+            Route::post('/avisos', [AnnouncementController::class, 'store'])->name('announcements.store');
         });
 
     // Zona de familias
@@ -71,6 +75,8 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             Route::view('/', 'guardian.dashboard')->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
+            Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
+            Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
         });
 
     // Perfil: lo comparten todos los roles
