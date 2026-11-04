@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -43,6 +44,10 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            Route::resource('educadoras', EducatorController::class)
+            ->parameters(['educadoras' => 'educator'])
+            ->except(['show'])
+            ->names('educators');
         });
 
     // Zona de educadoras (la coordinación también puede entrar)

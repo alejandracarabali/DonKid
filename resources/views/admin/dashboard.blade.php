@@ -22,6 +22,11 @@
                 <p class="font-medium">Familias</p>
                 <p class="text-sm text-gray-500">Crea cuentas y vincúlalas a sus hijos.</p>
             </a>
+                        <a href="{{ route('admin.educators.index') }}"
+               class="mt-4 block rounded-lg bg-white p-6 shadow-sm hover:bg-gray-50">
+                <p class="font-medium">Educadoras</p>
+                <p class="text-sm text-gray-500">Crea cuentas y asígnalas a sus grupos.</p>
+            </a>
         </div>
     </div>
 </x-app-layout>
