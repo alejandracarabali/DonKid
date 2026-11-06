@@ -8,12 +8,6 @@
                     <a href="{{ route('dashboard') }}">
                         <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                     </a>
-                    @if (auth()->user()->role->value === 'guardian' && auth()->user()->unreadNotifications()->count() > 0)
-                        <a href="{{ route('guardian.announcements.index') }}"
-                        class="text-sm bg-indigo-600 text-white px-2 py-1 rounded">
-                            {{ auth()->user()->unreadNotifications()->count() }} nuevos
-                        </a>
-                    @endif
                 </div>
 
                 <!-- Navigation Links -->
@@ -57,6 +51,15 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+
+            @if (auth()->user()->role->value === 'guardian' && auth()->user()->unreadNotifications()->count() > 0)
+                <div class="flex items-center ms-auto me-2 sm:me-0 sm:ms-4">
+                    <a href="{{ route('guardian.announcements.index') }}"
+                       class="text-sm bg-indigo-600 text-white px-2 py-1 rounded">
+                        {{ auth()->user()->unreadNotifications()->count() }} nuevos
+                    </a>
+                </div>
+            @endif            
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
