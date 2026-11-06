@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Educator;
 
+use App\Jobs\NotifyGuardiansOfAnnouncement;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AnnouncementRequest;
 use App\Models\Announcement;
@@ -38,6 +39,7 @@ class AnnouncementController extends Controller
         $announcement->author_id = $request->user()->id;
         $announcement->published_at = now();
         $announcement->save();
+        NotifyGuardiansOfAnnouncement::dispatch($announcement);        
 
         return redirect()->route('educator.dashboard')
             ->with('status', 'Aviso enviado a las familias.');

@@ -27,6 +27,7 @@ class AnnouncementController extends Controller
             ->latest('published_at')
             ->paginate(10);
 
+        $user->unreadNotifications->markAsRead();
         return view('guardian.announcements.index', compact('announcements'));
     }
 
