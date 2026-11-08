@@ -24,4 +24,8 @@ class Classroom extends Model
     {
         return $this->belongsToMany(User::class, 'classroom_user')->withTimestamps();
     }
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class);
+    }
 }
