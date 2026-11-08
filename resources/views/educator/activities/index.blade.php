@@ -54,8 +54,12 @@
                                 <div>
                                     <p class="font-medium">{{ $activity->title }}</p>
                                     <p class="text-sm text-gray-600">
-                                        {{ $activity->starts_at->format('H:i') }} – {{ $activity->ends_at->format('H:i') }}
-                                        · {{ $activity->classroom->name }}
+                                        {{ $activity->starts_at->format('H:i') }} –
+                                        @if ($activity->ends_at->isSameDay($activity->starts_at))
+                                            {{ $activity->ends_at->format('H:i') }}
+                                        @else
+                                            {{ $activity->ends_at->translatedFormat('j M, H:i') }}
+                                        @endif                                        · {{ $activity->classroom->name }}
                                     </p>
                                     @if ($activity->description)
                                         <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
