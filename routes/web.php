@@ -65,6 +65,12 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             Route::post('/bitacora/{child}', [DailyReportController::class, 'store'])->name('reports.store');
             Route::get('/avisos/crear', [AnnouncementController::class, 'create'])->name('announcements.create');
             Route::post('/avisos', [AnnouncementController::class, 'store'])->name('announcements.store');
+            Route::get('/actividades', [\App\Http\Controllers\Educator\ActivityController::class, 'index'])->name('activities.index');
+            Route::get('/actividades/crear', [\App\Http\Controllers\Educator\ActivityController::class, 'create'])->name('activities.create');
+            Route::post('/actividades', [\App\Http\Controllers\Educator\ActivityController::class, 'store'])->name('activities.store');
+            Route::get('/actividades/{activity}/editar', [\App\Http\Controllers\Educator\ActivityController::class, 'edit'])->name('activities.edit');
+            Route::put('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'update'])->name('activities.update');
+            Route::delete('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'destroy'])->name('activities.destroy');            
         });
 
     // Zona de familias
