@@ -83,6 +83,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
             Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
+            Route::get('/actividades', [\App\Http\Controllers\Guardian\ActivityController::class, 'index'])->name('activities.index');
         });
 
     // Perfil: lo comparten todos los roles
