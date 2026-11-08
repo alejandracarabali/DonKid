@@ -125,3 +125,13 @@ it('impide marcar como leído un aviso de otro grupo', function () {
         ->post(route('guardian.announcements.read', $ajeno))
         ->assertForbidden();
 });
+
+it('avisa a una educadora sin grupos que aún no tiene uno asignado', function () {
+    $educator = User::factory()->educator()->create();
+
+    $this->actingAs($educator)
+        ->get(route('educator.announcements.create'))
+        ->assertOk()
+        ->assertSee('Aún no tienes un grupo asignado')
+        ->assertDontSee('Enviar aviso');
+});
