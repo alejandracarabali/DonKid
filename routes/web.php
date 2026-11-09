@@ -78,7 +78,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         ->prefix('familia')
         ->name('guardian.')
         ->group(function () {
-            Route::view('/', 'guardian.dashboard')->name('dashboard');
+            Route::get('/', \App\Http\Controllers\Guardian\DashboardController::class)->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
