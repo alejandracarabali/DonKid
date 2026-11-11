@@ -22,6 +22,7 @@ trait BelongsToSchool
 {
     public static function bootBelongsToSchool(): void
     {
+        /** @disregard P1013 Laravel hereda este método de Model en tiempo de ejecución */
         static::addGlobalScope('school', function (Builder $query) {
             if (static::hasSchoolUser()) {
                 // qualifyColumn => "children.school_id": evita ambigüedad en los JOIN.
@@ -29,6 +30,7 @@ trait BelongsToSchool
             }
         });
 
+        /** @disregard P1013 Laravel hereda este método de Model en tiempo de ejecución */
         static::creating(function (Model $model) {
             if ($model->school_id === null) {
                 $model->school_id = $model->inheritedSchoolId()
