@@ -5,17 +5,17 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enums\Role;
+use App\Models\Concerns\BelongsToSchool;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, BelongsToSchool;
 
     /**
      * The attributes that are mass assignable.
@@ -37,7 +37,8 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-        /**
+
+    /**
      * Valor por defecto para usuarios recién creados.
      */
     protected $attributes = [
@@ -58,26 +59,29 @@ class User extends Authenticatable
             'must_change_password' => 'boolean',
         ];
     }
-        /**
+
+    /**
      * Uso: $user->hasRole(Role::Admin)
      */
     public function hasRole(Role ...$roles): bool
     {
         return in_array($this->role, $roles, true);
     }
-        // Un acudiente tiene varios niños.
+
+    // Un acudiente tiene varios niños.
     public function children(): BelongsToMany
     {
         return $this->belongsToMany(Child::class, 'child_guardian')
             ->withPivot('relationship')
             ->withTimestamps();
     }
-        // Una educadora atiende varios grupos.
+
+    // Una educadora atiende varios grupos.
     public function classrooms(): BelongsToMany
     {
         return $this->belongsToMany(Classroom::class, 'classroom_user')->withTimestamps();
     }
-    
+
     // Pertenece a un colegio. Uso: $modelo->school->name
     public function school(): BelongsTo
     {
