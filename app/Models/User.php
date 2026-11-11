@@ -3,7 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use App\Enums\Role;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -52,6 +55,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'must_change_password' => 'boolean',
         ];
     }
         /**
@@ -60,5 +64,23 @@ class User extends Authenticatable
     public function hasRole(Role ...$roles): bool
     {
         return in_array($this->role, $roles, true);
+    }
+        // Un acudiente tiene varios niños.
+    public function children(): BelongsToMany
+    {
+        return $this->belongsToMany(Child::class, 'child_guardian')
+            ->withPivot('relationship')
+            ->withTimestamps();
+    }
+        // Una educadora atiende varios grupos.
+    public function classrooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Classroom::class, 'classroom_user')->withTimestamps();
+    }
+    
+    // Pertenece a un colegio. Uso: $modelo->school->name
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }

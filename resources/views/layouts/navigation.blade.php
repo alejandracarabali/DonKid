@@ -52,6 +52,15 @@
                 </x-dropdown>
             </div>
 
+            @if (auth()->user()->role->value === 'guardian' && auth()->user()->unreadNotifications()->count() > 0)
+                <div class="flex items-center ms-auto me-2 sm:me-0 sm:ms-4">
+                    <a href="{{ route('guardian.announcements.index') }}"
+                       class="text-sm bg-indigo-600 text-white px-2 py-1 rounded">
+                        {{ auth()->user()->unreadNotifications()->count() }} nuevos
+                    </a>
+                </div>
+            @endif            
+
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">

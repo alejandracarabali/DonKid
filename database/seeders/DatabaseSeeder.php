@@ -38,5 +38,15 @@ class DatabaseSeeder extends Seeder
         foreach ($grupos as $grupo) {
             Child::factory()->count(4)->create(['classroom_id' => $grupo->id]);
         }
+
+        // Carlos es acudiente de los dos primeros niños.
+        $carlos = User::where('email', 'carlos@donkid.test')->first();
+        $carlos->children()->attach(
+            Child::take(2)->pluck('id'),
+            ['relationship' => 'Papá']
+        );
+                // Laura atiende el grupo Caminadores.
+        $laura = User::where('email', 'laura@donkid.test')->first();
+        $laura->classrooms()->attach(Classroom::where('name', 'Caminadores')->first());
     }
 }

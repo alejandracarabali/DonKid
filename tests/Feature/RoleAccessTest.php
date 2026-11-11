@@ -55,17 +55,3 @@ it('redirige cada rol a su zona desde /dashboard', function () {
         ->get('/dashboard')
         ->assertRedirect(route('educator.dashboard'));
 });
-
-// 5. Seguridad: el registro NO puede crear administradores.
-it('ignora el campo role en el registro', function () {
-    $this->post('/register', [
-        'name' => 'Intruso',
-        'email' => 'intruso@correo.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-        'role' => 'admin', // intento de escalar privilegios
-    ]);
-
-    expect(User::where('email', 'intruso@correo.com')->first()->role->value)
-        ->toBe('guardian');
-});

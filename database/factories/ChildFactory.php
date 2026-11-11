@@ -20,6 +20,9 @@ class ChildFactory extends Factory
     {
         return [
             'classroom_id' => Classroom::factory(),
+            // El niño queda en el mismo colegio que su grupo.
+            'school_id' => fn (array $attributes) => Classroom::find($attributes['classroom_id'])?->school_id
+                ?? SchoolFactory::defaultId(),            
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'birth_date' => fake()->dateTimeBetween('-5 years', '-1 year'),

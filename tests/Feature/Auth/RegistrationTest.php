@@ -1,19 +1,19 @@
 <?php
 
-test('registration screen can be rendered', function () {
-    $response = $this->get('/register');
+use App\Models\User;
 
-    $response->assertStatus(200);
-});
+// El registro público está cerrado: solo la coordinación crea cuentas.
+it('no permite el registro público', function () {
+    $this->get('/register')->assertNotFound();
 
-test('new users can register', function () {
-    $response = $this->post('/register', [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password',
-        'password_confirmation' => 'password',
-    ]);
+    $this->post('/register', [
+        'name' => 'Intruso',
+        'email' => 'intruso@correo.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        'role' => 'admin', // intento de escalar privilegios
+    ])->assertNotFound();
 
-    $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    // La prueba que importa: no se creó ninguna cuenta.
+    expect(User::where('email', 'intruso@correo.com')->exists())->toBeFalse();
 });

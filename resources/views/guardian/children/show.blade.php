@@ -1,0 +1,18 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Hoy con {{ $child->first_name }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <p class="text-gray-600">Aún no hay novedades de hoy. Te avisamos cuando haya.</p>
+        </div>
+    </div>
+
+    <a href="{{ route('guardian.reports.index', $child) }}"
+        class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
+        Ver la bitácora
+    </a>
+</x-app-layout>
