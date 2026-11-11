@@ -29,6 +29,9 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('/dashboard', function () {
         return redirect()->route(request()->user()->role->homeRoute());
     })->name('dashboard');
+    
+    // Guía de estilos: catálogo visual de los componentes base del diseño.
+    Route::view('/estilos', 'estilos')->middleware('auth')->name('estilos');
 
     // Zona de coordinación
     Route::middleware('role:admin')
