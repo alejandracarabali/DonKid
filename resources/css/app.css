@@ -17,6 +17,11 @@
         @apply disabled:cursor-not-allowed disabled:border-[#9AA4C7] disabled:bg-gray-200 disabled:text-gray-500;
     }
 
+        /* Variante de peligro: borrar cuenta o quitar registros. Se usa junto con .btn */
+    .btn-danger {
+        @apply border-bad bg-bad text-white hover:bg-bad/90;
+    }
+
     /* Variante secundaria: fondo blanco. Se usa junto con .btn */
     .btn-secondary {
         @apply border-ink bg-white text-ink hover:bg-canvas;
