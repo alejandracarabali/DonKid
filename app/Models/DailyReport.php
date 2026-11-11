@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @mixin IdeHelperDailyReport
+ */
 class DailyReport extends Model
 {
     // Solo lo que viene del formulario. educator_id y published_at

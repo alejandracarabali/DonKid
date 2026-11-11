@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+# Generados por laravel-ide-helper (se regeneran con los comandos de ide-helper)
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php

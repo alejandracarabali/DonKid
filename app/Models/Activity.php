@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @mixin IdeHelperActivity
+ */
 class Activity extends Model
 {
     // Solo estos campos se asignan en masa. classroom_id y author_id
