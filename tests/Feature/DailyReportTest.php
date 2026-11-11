@@ -7,7 +7,7 @@ use App\Models\User;
 
 function reportSetup(): array
 {
-    $classroom = Classroom::create(['name' => 'Caminadores']);
+    $classroom = Classroom::factory()->create(['name' => 'Caminadores']);
     $child = Child::create([
         'classroom_id' => $classroom->id,
         'first_name' => 'Ana',

@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Notification;
 
 function notifSetup(): array
 {
-    $grupo = Classroom::create(['name' => 'Caminadores']);
-    $otro = Classroom::create(['name' => 'Exploradores']);
+    $grupo = Classroom::factory()->create(['name' => 'Caminadores']);
+    $otro = Classroom::factory()->create(['name' => 'Exploradores']);
     $educator = User::factory()->educator()->create();
     $educator->classrooms()->attach($grupo);
 
