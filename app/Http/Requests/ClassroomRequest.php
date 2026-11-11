@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ClassroomRequest extends FormRequest
 {
+    use SchoolRules;
+
     // La zona ya está protegida por el middleware role:admin.
     public function authorize(): bool
     {
@@ -16,10 +18,10 @@ class ClassroomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Nombre único, ignorando el propio grupo al editar.
+            // Nombre único DENTRO del colegio, ignorando el propio grupo al editar.
             'name' => [
                 'required', 'string', 'max:60',
-                Rule::unique('classrooms', 'name')->ignore($this->route('classroom')),
+                $this->uniqueInSchool('classrooms', 'name')->ignore($this->route('classroom')),
             ],
             'age_range' => ['nullable', 'string', 'max:40'],
         ];
@@ -30,7 +32,7 @@ class ClassroomRequest extends FormRequest
     {
         return [
             'name.required' => 'Escribe el nombre del grupo.',
-            'name.unique' => 'Ya existe un grupo con ese nombre.',
+            'name.unique' => 'Ya existe un grupo con ese nombre en tu colegio.',
             'name.max' => 'El nombre es muy largo. Máximo 60 letras.',
         ];
     }

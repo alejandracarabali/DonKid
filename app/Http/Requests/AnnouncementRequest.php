@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AnnouncementRequest extends FormRequest
 {
+    use SchoolRules;
+
     public function authorize(): bool
     {
         return true;
@@ -14,7 +17,7 @@ class AnnouncementRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'classroom_id' => ['nullable', 'integer', 'exists:classrooms,id'],
+            'classroom_id' => ['nullable', 'integer', $this->existsInSchool('classrooms')],
             'title' => ['required', 'string', 'max:120'],
             'body' => ['required', 'string', 'max:2000'],
         ];
@@ -27,7 +30,7 @@ class AnnouncementRequest extends FormRequest
             'title.max' => 'El título admite hasta 120 caracteres.',
             'body.required' => 'Escribe el mensaje para las familias.',
             'body.max' => 'El mensaje admite hasta 2000 caracteres.',
-            'classroom_id.exists' => 'Ese grupo no existe.',
+            'classroom_id.exists' => 'Ese grupo no existe en tu colegio.',
         ];
     }
 }

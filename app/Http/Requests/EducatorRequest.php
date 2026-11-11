@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class EducatorRequest extends FormRequest
 {
+    use SchoolRules;
+
     public function authorize(): bool
     {
         return true;
@@ -16,12 +19,13 @@ class EducatorRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:80'],
+            // El correo sigue siendo único en TODA la plataforma: identifica la cuenta al iniciar sesión.
             'email' => [
                 'required', 'email', 'max:120',
                 Rule::unique('users', 'email')->ignore($this->route('educator')),
             ],
             'classrooms' => ['nullable', 'array'],
-            'classrooms.*' => ['exists:classrooms,id'],
+            'classrooms.*' => [$this->existsInSchool('classrooms')],
         ];
     }
 
@@ -32,7 +36,7 @@ class EducatorRequest extends FormRequest
             'email.required' => 'Escribe un correo, por ejemplo: ana@correo.com',
             'email.email' => 'Ese correo no parece válido. Revisa que tenga @.',
             'email.unique' => 'Ya hay una cuenta con ese correo.',
-            'classrooms.*.exists' => 'Uno de los grupos elegidos ya no existe.',
+            'classrooms.*.exists' => 'Uno de los grupos elegidos no existe en tu colegio.',
         ];
     }
 }

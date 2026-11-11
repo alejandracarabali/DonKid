@@ -2,10 +2,13 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ActivityRequest extends FormRequest
 {
+    use SchoolRules;
+
     // La autorización real está en la policy (el controlador usa Gate).
     public function authorize(): bool
     {
@@ -15,7 +18,7 @@ class ActivityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'classroom_id' => ['required', 'integer', 'exists:classrooms,id'],
+            'classroom_id' => ['required', 'integer', $this->existsInSchool('classrooms')],
             'title' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string', 'max:500'],
             'starts_at' => ['required', 'date'],
@@ -27,6 +30,7 @@ class ActivityRequest extends FormRequest
     {
         return [
             'classroom_id.required' => 'Elige el grupo de la actividad.',
+            'classroom_id.exists' => 'Ese grupo no existe en tu colegio.',
             'title.required' => 'Escribe un título para la actividad.',
             'starts_at.required' => 'Indica cuándo empieza.',
             'ends_at.required' => 'Indica cuándo termina.',
