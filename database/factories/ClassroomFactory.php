@@ -18,6 +18,7 @@ class ClassroomFactory extends Factory
     public function definition(): array
     {
         return [
+            'school_id' => fn () => SchoolFactory::defaultId(),            
             'name' => fake()->unique()->randomElement([
                 'Caminadores', 'Exploradores', 'Pequeños Artistas', 'Mariposas',
             ]),

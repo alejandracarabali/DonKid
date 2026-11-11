@@ -33,4 +33,10 @@ class Announcement extends Model
             ->withPivot('read_at')
             ->withTimestamps();
     }
+    
+    // Pertenece a un colegio. Uso: $modelo->school->name
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
 }

@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use App\Enums\SchoolType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class School extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name', 'slug', 'type'];
 
     protected function casts(): array
@@ -28,5 +31,10 @@ class School extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Child::class);
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
     }
 }
