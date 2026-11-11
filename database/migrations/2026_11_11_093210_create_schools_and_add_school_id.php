@@ -30,7 +30,7 @@ return new class extends Migration
 
         foreach ($this->tables as $name) {
             Schema::table($name, function (Blueprint $table) {
-                $table->foreignId('school_id')->nullable()->constrained()->cascadeOnDelete();
+                $table->foreignId('school_id')->nullable()->constrained()->restrictOnDelete();
             });
 
             DB::table($name)->update(['school_id' => $schoolId]);
