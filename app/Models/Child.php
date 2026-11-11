@@ -39,4 +39,10 @@ class Child extends Model
     {
         return $this->hasMany(DailyReport::class);
     }
+    
+    // Pertenece a un colegio. Uso: $modelo->school->name
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
+    }
 }

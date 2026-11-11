@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\SchoolType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class School extends Model
+{
+    use HasFactory;
+
+    protected $fillable = ['name', 'slug', 'type'];
+
+    protected function casts(): array
+    {
+        return ['type' => SchoolType::class];
+    }
+
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function classrooms(): HasMany
+    {
+        return $this->hasMany(Classroom::class);
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(Child::class);
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
+    }
+}

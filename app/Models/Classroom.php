@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,5 +28,11 @@ class Classroom extends Model
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class);
+    }
+    
+    // Pertenece a un colegio. Uso: $modelo->school->name
+    public function school(): BelongsTo
+    {
+        return $this->belongsTo(School::class);
     }
 }
