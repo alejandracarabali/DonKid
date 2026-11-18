@@ -15,9 +15,8 @@ use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// La raíz no tiene página propia: /dashboard ya sabe adónde mandar a cada quien.
+Route::redirect('/', '/dashboard');
 
 // Estas rutas quedan FUERA de 'password.changed'; si no, habría un bucle infinito.
 Route::middleware('auth')->group(function () {
