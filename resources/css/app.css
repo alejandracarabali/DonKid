@@ -52,4 +52,18 @@
     .tag-pending {
         @apply border border-line bg-canvas text-soft;
     }
+    /* Opción de toque (ánimo, comida). El estilo sale de aria-pressed:
+       si se VE marcada, el lector de pantalla también la anuncia como marcada. */
+    .opt {
+        @apply relative flex min-h-[84px] flex-col items-center justify-center gap-1 rounded-[14px] border-2 border-line bg-white p-2 text-[13px] font-semibold text-ink;
+    }
+
+    .opt[aria-pressed="true"] {
+        @apply border-[3px] border-navy bg-amber font-bold text-navy;
+    }
+
+    .opt[aria-pressed="true"]::after {
+        content: "✓";
+        @apply absolute -right-1.5 -top-2 grid h-[22px] w-[22px] place-items-center rounded-full bg-navy text-[13px] text-white;
+    }    
 }

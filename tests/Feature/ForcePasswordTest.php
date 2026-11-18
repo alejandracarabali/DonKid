@@ -70,3 +70,13 @@ it('marca como pendiente la clave de una familia recién creada', function () {
 
     expect(User::where('email', 'rosa@correo.com')->first()->must_change_password)->toBeTrue();
 });
+
+it('usa la palabra contraseña en la pantalla de cambio obligatorio', function () {
+    $familia = User::factory()->guardian()->create(['must_change_password' => true]);
+
+    $this->actingAs($familia)
+        ->get(route('password.force'))
+        ->assertOk()
+        ->assertSee('Crea tu contraseña nueva')
+        ->assertDontSee('Clave que te dieron');
+});

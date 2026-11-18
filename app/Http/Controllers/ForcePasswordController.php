@@ -20,11 +20,11 @@ class ForcePasswordController extends Controller
             // different: no puede "cambiar" la clave por la misma.
             'password' => ['required', 'confirmed', 'different:current_password', Password::defaults()],
         ], [
-            'current_password.required' => 'Escribe la clave que te dieron.',
-            'current_password.current_password' => 'Esa no es la clave que te dieron.',
-            'password.required' => 'Elige una clave nueva.',
-            'password.confirmed' => 'Las dos claves no coinciden.',
-            'password.different' => 'Elige una clave distinta a la temporal.',
+            'current_password.required' => 'Escribe la contraseña que te dieron.',
+            'current_password.current_password' => 'Esa no es la contraseña que te dieron.',
+            'password.required' => 'Elige una contraseña nueva.',
+            'password.confirmed' => 'Las dos contraseñas no coinciden.',
+            'password.different' => 'Elige una contraseña distinta a la temporal.',
         ]);
 
         // forceFill: must_change_password no está en $fillable, y es intencional.

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Educator\AnnouncementController;
 use App\Http\Controllers\Guardian\AnnouncementController as GuardianAnnouncementController;
 use App\Http\Controllers\Guardian\DailyReportController as GuardianReportController;
@@ -38,8 +39,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
         ->prefix('admin')
         ->name('admin.')
         ->group(function () {
-            Route::view('/', 'admin.dashboard')->name('dashboard');
-            Route::resource('grupos', ClassroomController::class)
+            Route::get('/', DashboardController::class)->name('dashboard');            Route::resource('grupos', ClassroomController::class)
             ->parameters(['grupos' => 'classroom'])
             ->except(['show'])
             ->names('classrooms');

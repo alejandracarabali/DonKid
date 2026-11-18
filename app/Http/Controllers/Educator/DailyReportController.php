@@ -16,7 +16,7 @@ use Illuminate\View\View;
 
 class DailyReportController extends Controller
 {
-    // Lista de niños del/los grupo(s) de la educadora.
+    // "Mi grupo": estudiantes del/los grupo(s) de la docente, con el avance del día.
     public function index(Request $request): View
     {
         $user = $request->user();
@@ -28,9 +28,19 @@ class DailyReportController extends Controller
             )
             ->with(['dailyReports' => fn ($q) => $q->whereDate('report_date', today())])
             ->orderBy('first_name')
-            ->get();
+            ->get()
+            // Pendientes primero: false (sin reporte) va antes que true. Dentro de cada
+            // grupo se conserva el orden alfabético porque el ordenamiento es estable.
+            ->sortBy(fn (Child $child) => $child->dailyReports->isNotEmpty())
+            ->values();
 
-        return view('educator.reports.index', compact('children'));
+        $sent = $children->filter(fn (Child $child) => $child->dailyReports->isNotEmpty())->count();
+
+        return view('educator.reports.index', [
+            'children' => $children,
+            'sent' => $sent,
+            'total' => $children->count(),
+        ]);
     }
 
     // Formulario de toques para un niño.
