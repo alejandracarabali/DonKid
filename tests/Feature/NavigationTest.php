@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 test('la docente ve la barra inferior con sus secciones', function () {
     $this->actingAs(User::factory()->educator()->create())
-        ->get(route('educator.dashboard'))
+        ->get(route('educator.reports.index'))
         ->assertOk()
         ->assertSee('aria-label="Navegación principal"', false)
         ->assertSee('Bitácora')

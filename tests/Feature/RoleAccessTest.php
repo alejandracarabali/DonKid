@@ -12,7 +12,7 @@ it('permite a cada rol entrar a su zona', function (string $estado, string $ruta
         ->assertOk();
 })->with([
     'coordinación' => ['admin', 'admin.dashboard'],
-    'educadora'    => ['educator', 'educator.dashboard'],
+    'educadora'    => ['educator', 'educator.reports.index'],
     'familia'      => ['guardian', 'guardian.dashboard'],
 ]);
 
@@ -29,7 +29,7 @@ it('impide que una familia entre a la zona de educadoras', function () {
     $madre = User::factory()->guardian()->create();
 
     $this->actingAs($madre)
-        ->get(route('educator.dashboard'))
+        ->get(route('educator.reports.index'))
         ->assertForbidden();
 });
 
