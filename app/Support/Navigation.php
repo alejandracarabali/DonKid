@@ -27,10 +27,11 @@ class Navigation
                 self::item('Nuevo aviso', 'educator.announcements.create', 'educator.announcements.*'),
             ],
             Role::Educator => [
-                self::item('Inicio', 'educator.dashboard', 'educator.dashboard'),
                 self::item('Bitácora', 'educator.reports.index', 'educator.reports.*'),
-                self::item('Avisos', 'educator.announcements.create', 'educator.announcements.*'),
+                self::item('Grupos', 'educator.groups.index', 'educator.groups.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
+                self::item('Avisos', 'educator.announcements.create', 'educator.announcements.*'),
+                self::item('Perfil', 'profile.edit', 'profile.*'),
             ],
             Role::Guardian => [
                 self::item('Inicio', 'guardian.dashboard', 'guardian.dashboard'),
