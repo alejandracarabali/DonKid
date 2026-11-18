@@ -46,6 +46,12 @@ class Child extends Model
         return $this->hasMany(DailyReport::class);
     }
 
+        // Uso: $child->attendances
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
     // Pertenece a un colegio. Uso: $modelo->school->name
     public function school(): BelongsTo
     {
