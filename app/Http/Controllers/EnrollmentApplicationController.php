@@ -38,13 +38,27 @@ class EnrollmentApplicationController extends Controller
         try {
             // Transacción: si algo falla, no queda una solicitud a medias en la base de datos.
             $application = DB::transaction(function () use ($request, $school, &$stored) {
-                $application = new EnrollmentApplication($request->safe()->except(['website', 'documents']));
+                $application = new EnrollmentApplication(
+                    $request->safe()->except(['website', 'documents', 'consent_data', 'consent_health'])
+                );
                 // El colegio sale de la URL, nunca del formulario: así nadie la envía a otro colegio.
                 $application->school_id = $school->id;
+
+                // RF-37: prueba de la autorización. forceFill porque estos campos no son asignables
+                // desde el formulario: los pone el servidor.
+                $application->forceFill([
+                    'data_consent_at' => now(),
+                    'health_consent_at' => $request->boolean('consent_health') ? now() : null,
+                    'consent_ip' => $request->ip(),
+                    'consent_policy_version' => config('privacy.policy_version'),
+                ]);
                 $application->save();
 
                 foreach (EnrollmentDocumentType::cases() as $type) {
                     $file = $request->file("documents.{$type->value}");
+                    if (! $file) {
+                        continue; // documento opcional que no se adjuntó
+                    }
                     // Nombre aleatorio en el disco PRIVADO: el nombre original no se usa como ruta.
                     $path = $file->storeAs(
                         "inscripciones/{$application->id}",
@@ -73,6 +87,12 @@ class EnrollmentApplicationController extends Controller
         return redirect()
             ->route('enrollment.sent', $school)
             ->with('reference', $application->reference());
+    }
+
+    // Política de tratamiento de datos del colegio (enlazada desde la autorización).
+    public function policy(School $school): View
+    {
+        return view('enrollment.policy', ['school' => $school]);
     }
 
     public function sent(School $school): View|RedirectResponse

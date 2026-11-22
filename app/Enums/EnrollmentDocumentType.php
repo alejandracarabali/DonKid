@@ -20,6 +20,18 @@ enum EnrollmentDocumentType: string
         };
     }
 
+    // Carné de vacunas y certificado de EPS son datos de salud (sensibles, Ley 1581 art. 5).
+    public function isHealth(): bool
+    {
+        return in_array($this, [self::VaccinationCard, self::EpsCertificate], true);
+    }
+
+    // ¿Es obligatorio en el formulario? Los de salud dependen de config/privacy.php.
+    public function isRequired(): bool
+    {
+        return ! $this->isHealth() || config('privacy.health_documents_required');
+    }
+
     // Formatos aceptados: la foto solo como imagen; los demás también en PDF.
     /** @return list<string> */
     public function mimes(): array

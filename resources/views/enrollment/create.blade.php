@@ -120,14 +120,43 @@
 
             @foreach ($enrollmentDocuments as $doc)
                 <div>
-                    <x-input-label for="doc_{{ $doc->value }}" :value="$doc->label()" />
+                    <x-input-label for="doc_{{ $doc->value }}" :value="$doc->label().($doc->isRequired() ? '' : ' (opcional)')" />
                     <input id="doc_{{ $doc->value }}" name="documents[{{ $doc->value }}]" type="file"
-                           accept="{{ $doc->accept() }}" required
+                           accept="{{ $doc->accept() }}" @required($doc->isRequired())
                            class="mt-1 block w-full text-sm file:mr-3 file:min-h-[44px] file:rounded-xl file:border-2 file:border-navy file:bg-amber file:px-4 file:font-bold file:text-navy">
                     <x-input-error :messages="$errors->get('documents.'.$doc->value)" class="mt-2" />
                 </div>
             @endforeach
             <p class="text-sm text-soft">Si hay un error en el formulario, vuelve a adjuntar los documentos.</p>
+        </fieldset>
+
+        {{-- RF-37: autorización de tratamiento de datos (Ley 1581). Dos casillas: los datos de salud son sensibles. --}}
+        <fieldset class="space-y-3">
+            <legend class="text-lg font-semibold">Autorización de datos</legend>
+
+            <label class="flex items-start gap-3">
+                <input type="checkbox" name="consent_data" value="1" @checked(old('consent_data')) required
+                       class="mt-1 h-6 w-6 shrink-0 rounded border-2 border-line text-action focus:ring-action">
+                <span class="text-sm">
+                    Como acudiente y representante legal del niño o niña, autorizo a {{ $school->name }} para recoger y tratar
+                    mis datos personales y los de mi hijo o hija, con las finalidades descritas en la
+                    <a href="{{ route('enrollment.policy', $school) }}" target="_blank" rel="noopener" class="font-bold text-action underline">política de tratamiento de datos</a>.
+                    Puedo conocer, actualizar, rectificar y suprimir mis datos, y revocar esta autorización, escribiendo a coordinación.
+                </span>
+            </label>
+            <x-input-error :messages="$errors->get('consent_data')" />
+
+            <label class="flex items-start gap-3">
+                <input type="checkbox" name="consent_health" value="1" @checked(old('consent_health'))
+                       @required(config('privacy.health_documents_required'))
+                       class="mt-1 h-6 w-6 shrink-0 rounded border-2 border-line text-action focus:ring-action">
+                <span class="text-sm">
+                    Autorizo de forma expresa el tratamiento de los datos de salud de mi hijo o hija (carné de vacunas,
+                    certificado de EPS, alergias, condiciones y medicamentos) para cuidar su salud y atender emergencias.
+                    Sé que no estoy obligado a entregar datos sensibles.
+                </span>
+            </label>
+            <x-input-error :messages="$errors->get('consent_health')" />
         </fieldset>
 
         <x-input-error :messages="$errors->get('website')" />

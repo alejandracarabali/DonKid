@@ -36,6 +36,8 @@ class EnrollmentApplication extends Model
             'guardian_document_number' => 'encrypted',
             'guardian_address' => 'encrypted',
             'reviewed_at' => 'datetime',
+            'data_consent_at' => 'datetime',
+            'health_consent_at' => 'datetime',
         ];
     }
 

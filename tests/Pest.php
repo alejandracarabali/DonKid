@@ -71,6 +71,8 @@ function enrollmentData(array $overrides = []): array
         'guardian_email' => 'marta@correo.co',
         'guardian_phone' => '300 123 4567',
         'guardian_address' => 'Calle 10 # 20-30, Cali',
+        'consent_data' => '1',
+        'consent_health' => '1',
         'documents' => enrollmentFiles(),
     ], $overrides);
 }
