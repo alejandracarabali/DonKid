@@ -16,6 +16,9 @@ use App\Http\Controllers\Guardian\FamilyRequestController as GuardianRequestCont
 use App\Http\Controllers\Educator\FamilyRequestController as EducatorRequestController;
 use App\Http\Controllers\Admin\FamilyRequestController as AdminRequestController;
 use App\Http\Controllers\Admin\SchoolYearController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\ClassroomSubjectController;
+use App\Http\Controllers\Admin\PerformanceLevelController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -106,6 +109,16 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'edit'])->name('school-years.edit');
             Route::put('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'update'])->name('school-years.update');
             Route::post('anio-escolar/{schoolYear}/actual', [SchoolYearController::class, 'makeCurrent'])->name('school-years.current');
+
+            // RF-04 y RF-05: materias, dimensiones y escala de desempeños.
+            Route::get('materias', [SubjectController::class, 'index'])->name('subjects.index');
+            Route::post('materias', [SubjectController::class, 'store'])->name('subjects.store');
+            Route::patch('materias/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+            Route::post('materias/{subject}/activar', [SubjectController::class, 'toggle'])->name('subjects.toggle');
+            Route::get('grupos/{classroom}/materias', [ClassroomSubjectController::class, 'edit'])->name('classrooms.subjects');
+            Route::put('grupos/{classroom}/materias', [ClassroomSubjectController::class, 'update'])->name('classrooms.subjects.update');
+            Route::get('escala', [PerformanceLevelController::class, 'edit'])->name('performance.edit');
+            Route::put('escala', [PerformanceLevelController::class, 'update'])->name('performance.update');
 
             // Fase 5: todas las solicitudes de las familias.
             Route::get('solicitudes', [AdminRequestController::class, 'index'])->name('requests.index');

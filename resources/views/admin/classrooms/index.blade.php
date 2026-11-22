@@ -30,6 +30,7 @@
 
                     <div class="flex items-center gap-4">
                         <a href="{{ route('admin.classrooms.edit', $classroom) }}" class="text-sm underline">Editar</a>
+                        <a href="{{ route('admin.classrooms.subjects', $classroom) }}" class="text-sm underline">{{ $classroom->level?->isPreschool() ? 'Dimensiones' : 'Materias' }}</a>
 
                         <form method="POST" action="{{ route('admin.classrooms.destroy', $classroom) }}"
                               onsubmit="return confirm('¿Quitar este grupo? Sus niños quedarán sin grupo.')">

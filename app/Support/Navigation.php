@@ -23,6 +23,8 @@ class Navigation
             Role::Admin => [
                 self::item('Inicio', 'admin.dashboard', 'admin.dashboard'),
                 self::item('Año escolar', 'admin.school-years.index', 'admin.school-years.*'),
+                self::item('Materias', 'admin.subjects.index', 'admin.subjects.*'),
+                self::item('Escala', 'admin.performance.edit', 'admin.performance.*'),
                 self::item('Grupos', 'admin.classrooms.index', 'admin.classrooms.*'),
                 self::item('Estudiantes', 'admin.children.index', 'admin.children.*'),
                 self::item('Inscripciones', 'admin.enrollments.index', 'admin.enrollments.*',
