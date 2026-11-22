@@ -5,6 +5,11 @@
     </x-slot>
 
     <div class="mx-auto max-w-3xl space-y-3 px-4 py-4 sm:px-6 lg:px-0">
+        {{-- Fase 5: en primaria no hay Bitácora; el director ve aquí las solicitudes de las familias. --}}
+        @unless (\App\Support\Navigation::offersDailyLog(auth()->user()))
+            <x-family-requests />
+        @endunless
+
         @if ($classrooms->isEmpty())
             <div class="card py-6 text-center">
                 <x-mascot class="mx-auto" />

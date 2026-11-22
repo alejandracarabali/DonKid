@@ -27,6 +27,7 @@ class Navigation
                 self::item('Inscripciones', 'admin.enrollments.index', 'admin.enrollments.*',
                     EnrollmentApplication::where('status', EnrollmentStatus::Pending)->count()),
                 self::item('Renovaciones', 'admin.renewals.index', 'admin.renewals.*'),
+                self::item('Solicitudes', 'admin.requests.index', 'admin.requests.*'),
                 self::item('Familias', 'admin.guardians.index', 'admin.guardians.*'),
                 self::item('Docentes', 'admin.educators.index', 'admin.educators.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
@@ -51,6 +52,7 @@ class Navigation
                 self::item('Avisos', 'guardian.announcements.index', 'guardian.announcements.*',
                     $user->unreadNotifications()->count()),
                 self::item('Actividades', 'guardian.activities.index', 'guardian.activities.*'),
+                self::item('Solicitudes', 'guardian.requests.index', 'guardian.requests.*'),
                 self::item('Mensajes', 'guardian.messages.index', 'guardian.messages.*', self::unreadForGuardian($user)),
             ],
         };
