@@ -8,6 +8,7 @@ use App\Enums\GradeLevel;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Solicitud de inscripción enviada por una familia desde el enlace público (RF-34).
@@ -41,6 +42,11 @@ class EnrollmentApplication extends Model
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(EnrollmentDocument::class);
     }
 
     // Código corto para que la familia pueda referirse a su solicitud.

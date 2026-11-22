@@ -2,7 +2,8 @@
     <h1 class="text-2xl font-semibold">Inscripción</h1>
     <p class="mt-1 text-soft">{{ $school->name }} · Cuéntanos sobre tu hijo o hija y te contactaremos.</p>
 
-    <form method="POST" action="{{ route('enrollment.store', $school) }}" class="mt-4 space-y-6" novalidate>
+    <form method="POST" action="{{ route('enrollment.store', $school) }}" class="mt-4 space-y-6"
+          enctype="multipart/form-data" novalidate>
         @csrf
 
         {{-- Trampa anti-bots: invisible para las personas; si un bot la llena, se rechaza. --}}
@@ -110,6 +111,23 @@
                     maxlength="200" autocomplete="street-address" :value="old('guardian_address')" required />
                 <x-input-error :messages="$errors->get('guardian_address')" class="mt-2" />
             </div>
+        </fieldset>
+
+        {{-- Documentos obligatorios. Se guardan en un disco privado: solo coordinación los abre. --}}
+        <fieldset class="space-y-4">
+            <legend class="text-lg font-semibold">Documentos</legend>
+            <p class="text-sm text-soft">PDF o foto clara, máximo 4 MB cada uno. Solo coordinación puede verlos.</p>
+
+            @foreach ($enrollmentDocuments as $doc)
+                <div>
+                    <x-input-label for="doc_{{ $doc->value }}" :value="$doc->label()" />
+                    <input id="doc_{{ $doc->value }}" name="documents[{{ $doc->value }}]" type="file"
+                           accept="{{ $doc->accept() }}" required
+                           class="mt-1 block w-full text-sm file:mr-3 file:min-h-[44px] file:rounded-xl file:border-2 file:border-navy file:bg-amber file:px-4 file:font-bold file:text-navy">
+                    <x-input-error :messages="$errors->get('documents.'.$doc->value)" class="mt-2" />
+                </div>
+            @endforeach
+            <p class="text-sm text-soft">Si hay un error en el formulario, vuelve a adjuntar los documentos.</p>
         </fieldset>
 
         <x-input-error :messages="$errors->get('website')" />
