@@ -12,6 +12,9 @@ use App\Http\Controllers\Admin\RenewalController as AdminRenewalController;
 use App\Http\Controllers\Guardian\RenewalController as GuardianRenewalController;
 use App\Http\Controllers\Guardian\MessageController as GuardianMessageController;
 use App\Http\Controllers\Educator\MessageController as EducatorMessageController;
+use App\Http\Controllers\Guardian\FamilyRequestController as GuardianRequestController;
+use App\Http\Controllers\Educator\FamilyRequestController as EducatorRequestController;
+use App\Http\Controllers\Admin\FamilyRequestController as AdminRequestController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -95,6 +98,9 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            // Fase 5: todas las solicitudes de las familias.
+            Route::get('solicitudes', [AdminRequestController::class, 'index'])->name('requests.index');
+
             // RF-36: renovación de matrícula.
             Route::get('renovaciones', [AdminRenewalController::class, 'index'])->name('renewals.index');
             Route::post('renovaciones/abrir', [AdminRenewalController::class, 'open'])->name('renewals.open');
@@ -117,6 +123,8 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->prefix('docente')
         ->name('educator.')
         ->group(function () {
+            // Fase 5: el director atiende las solicitudes de las familias.
+            Route::post('/solicitudes/{familyRequest}/atender', [EducatorRequestController::class, 'handle'])->name('requests.handle');
             // RF-27: bandeja de mensajes de las familias.
             Route::get('/mensajes', [EducatorMessageController::class, 'index'])->name('messages.index');
             Route::get('/mensajes/{conversation}', [EducatorMessageController::class, 'show'])->name('messages.show');
@@ -160,6 +168,12 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
+            // Fase 5: solicitudes (excusa, permiso, recomendación).
+            Route::get('/solicitudes', [GuardianRequestController::class, 'index'])->name('requests.index');
+            Route::get('/ninos/{child}/solicitudes', [GuardianRequestController::class, 'child'])->name('requests.child');
+            Route::get('/ninos/{child}/solicitudes/nueva/{type}', [GuardianRequestController::class, 'create'])->name('requests.create');
+            Route::post('/ninos/{child}/solicitudes', [GuardianRequestController::class, 'store'])
+                ->middleware('throttle:10,1')->name('requests.store');
             // RF-27: mensajes al director de grupo.
             Route::get('/mensajes', [GuardianMessageController::class, 'index'])->name('messages.index');
             Route::get('/mensajes/{child}', [GuardianMessageController::class, 'show'])->name('messages.show');
