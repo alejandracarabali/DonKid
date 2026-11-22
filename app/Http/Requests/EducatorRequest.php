@@ -32,7 +32,7 @@ class EducatorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Escribe el nombre de la educadora.',
+            'name.required' => 'Escribe el nombre del docente.',
             'email.required' => 'Escribe un correo, por ejemplo: ana@correo.com',
             'email.email' => 'Ese correo no parece válido. Revisa que tenga @.',
             'email.unique' => 'Ya hay una cuenta con ese correo.',

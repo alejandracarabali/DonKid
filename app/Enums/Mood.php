@@ -21,7 +21,7 @@ enum Mood: string
             self::Calm => 'Tranquilo',
             self::Tired => 'Cansado',
             self::Sad => 'Triste',
-            self::Fussy => 'Emocionado',
+            self::Fussy => 'Inquieto',
             self::Angry => 'Enojado',
         };
     }

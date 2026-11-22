@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Educadoras</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Docentes</h2>
             <a href="{{ route('admin.educators.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm">
-                Nueva educadora
+               class="btn btn-sm">
+                + Nuevo docente
             </a>
         </div>
     </x-slot>
@@ -20,7 +20,7 @@
 
             @if (session('temporal_password'))
                 <div class="mb-4 rounded-md bg-yellow-50 p-4 text-yellow-900" role="alert">
-                    <p class="font-medium">Entrega estos datos a la educadora. Solo se muestran ahora.</p>
+                    <p class="font-medium">Entrega estos datos al docente. Solo se muestran ahora.</p>
                     <p class="mt-1">Correo: <strong>{{ session('temporal_password.email') }}</strong></p>
                     <p>Contraseña temporal: <strong>{{ session('temporal_password.password') }}</strong></p>
                 </div>
@@ -48,7 +48,7 @@
                     </div>
                 </div>
             @empty
-                <p class="text-gray-600">Aún no hay educadoras. Crea la primera.</p>
+                <p class="text-gray-600">Aún no hay docentes. Crea el primero.</p>
             @endforelse
 
             {{ $educators->links() }}

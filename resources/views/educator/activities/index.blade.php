@@ -38,8 +38,8 @@
 
             <div>
                 <a href="{{ route('educator.activities.create') }}"
-                   class="inline-block px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">
-                    Nueva actividad
+                   class="btn btn-sm">
+                    + Nueva actividad
                 </a>
             </div>
 

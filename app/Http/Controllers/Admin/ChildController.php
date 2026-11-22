@@ -30,7 +30,9 @@ class ChildController extends Controller
 
     public function store(ChildRequest $request)
     {
-        Child::create($request->validated());
+        $data = $request->validated();
+        $child = Child::create(collect($data)->except('health')->all());
+        $this->saveHealth($child, $data['health'] ?? []);
 
         return redirect()->route('admin.children.index')
             ->with('status', 'Listo, el niño quedó guardado.');
@@ -39,14 +41,16 @@ class ChildController extends Controller
     public function edit(Child $child)
     {
         return view('admin.children.edit', [
-            'child' => $child,
+            'child' => $child->load('healthRecord'),
             'classrooms' => Classroom::orderBy('name')->get(),
         ]);
     }
 
     public function update(ChildRequest $request, Child $child)
     {
-        $child->update($request->validated());
+        $data = $request->validated();
+        $child->update(collect($data)->except('health')->all());
+        $this->saveHealth($child, $data['health'] ?? []);
 
         return redirect()->route('admin.children.index')
             ->with('status', 'Listo, cambios guardados.');
@@ -90,5 +94,11 @@ class ChildController extends Controller
 
         return redirect()->route('admin.children.index')
             ->with('status', "{$child->first_name} volvió a estar activo.");
+    }
+
+    // RF-38: crea o actualiza la ficha de salud (una por niño).
+    private function saveHealth(Child $child, array $health): void
+    {
+        $child->healthRecord()->updateOrCreate([], $health);
     }
 }

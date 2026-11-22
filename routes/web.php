@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
 use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
+use App\Http\Controllers\EnrollmentApplicationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,13 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/dashboard');
 
 // Estas rutas quedan FUERA de 'password.changed'; si no, habría un bucle infinito.
+// RF-34: inscripción pública, sin iniciar sesión. El colegio se identifica por su slug.
+// throttle: máximo 5 envíos por hora desde la misma conexión (protección contra abuso).
+Route::get('/inscripcion/{school:slug}', [EnrollmentApplicationController::class, 'create'])->name('enrollment.create');
+Route::post('/inscripcion/{school:slug}', [EnrollmentApplicationController::class, 'store'])
+    ->middleware('throttle:5,60')->name('enrollment.store');
+Route::get('/inscripcion/{school:slug}/enviada', [EnrollmentApplicationController::class, 'sent'])->name('enrollment.sent');
+
 Route::middleware('auth')->group(function () {
     Route::get('/cambiar-clave', [ForcePasswordController::class, 'edit'])->name('password.force');
     Route::put('/cambiar-clave', [ForcePasswordController::class, 'update'])->name('password.force.update');
@@ -57,19 +65,19 @@ Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(functi
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
-            Route::resource('educadoras', EducatorController::class)
-            ->parameters(['educadoras' => 'educator'])
+            Route::resource('docentes', EducatorController::class)
+            ->parameters(['docentes' => 'educator'])
             ->except(['show'])
             ->names('educators');
         });
 
     // Zona de educadoras (la coordinación también puede entrar)
     Route::middleware('role:educator,admin')
-        ->prefix('educadora')
+        ->prefix('docente')
         ->name('educator.')
         ->group(function () {
             // La docente no tiene "Inicio": su pantalla principal es Bitácora.
-            Route::redirect('/', '/educadora/bitacora')->name('dashboard');
+            Route::redirect('/', '/docente/bitacora')->name('dashboard');
 
             // Bitácora
             Route::get('/bitacora', [DailyReportController::class, 'index'])->name('reports.index');
