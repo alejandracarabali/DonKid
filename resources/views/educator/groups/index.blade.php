@@ -10,6 +10,14 @@
             <x-family-requests />
         @endunless
 
+        {{-- RF-07/RF-08: materias o dimensiones que dicta (en primaria también están en Notas). --}}
+        @php $assignments = \App\Http\Controllers\Educator\GradeController::assignmentsOf(auth()->user()); @endphp
+        @if ($assignments->isNotEmpty() && \App\Support\Navigation::offersDailyLog(auth()->user()))
+            <h2 class="text-xl font-semibold">Notas e informes</h2>
+            @include('educator.grades._assignments', ['classrooms' => $assignments])
+            <h2 class="pt-3 text-xl font-semibold">Asistencia</h2>
+        @endif
+
         @if ($classrooms->isEmpty())
             <div class="card py-6 text-center">
                 <x-mascot class="mx-auto" />
