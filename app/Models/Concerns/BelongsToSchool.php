@@ -25,8 +25,18 @@ trait BelongsToSchool
         /** @disregard P1013 Laravel hereda este método de Model en tiempo de ejecución */
         static::addGlobalScope('school', function (Builder $query) {
             if (static::hasSchoolUser()) {
+                $schoolId = auth()->guard()->user()->school_id;
+
+                // Un usuario conectado SIN colegio (el superadministrador) no ve nada.
+                // Sin esto, where(school_id, null) no filtraría como se espera.
+                if ($schoolId === null) {
+                    $query->whereRaw('1 = 0');
+
+                    return;
+                }
+
                 // qualifyColumn => "children.school_id": evita ambigüedad en los JOIN.
-                $query->where($query->qualifyColumn('school_id'), auth()->guard()->user()->school_id);
+                $query->where($query->qualifyColumn('school_id'), $schoolId);
             }
         });
 
