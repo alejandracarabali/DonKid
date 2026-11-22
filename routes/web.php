@@ -15,6 +15,7 @@ use App\Http\Controllers\Educator\MessageController as EducatorMessageController
 use App\Http\Controllers\Guardian\FamilyRequestController as GuardianRequestController;
 use App\Http\Controllers\Educator\FamilyRequestController as EducatorRequestController;
 use App\Http\Controllers\Admin\FamilyRequestController as AdminRequestController;
+use App\Http\Controllers\Admin\SchoolYearController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -98,6 +99,14 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            // RF-02: año escolar y periodos.
+            Route::get('anio-escolar', [SchoolYearController::class, 'index'])->name('school-years.index');
+            Route::get('anio-escolar/nuevo', [SchoolYearController::class, 'create'])->name('school-years.create');
+            Route::post('anio-escolar', [SchoolYearController::class, 'store'])->name('school-years.store');
+            Route::get('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'edit'])->name('school-years.edit');
+            Route::put('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'update'])->name('school-years.update');
+            Route::post('anio-escolar/{schoolYear}/actual', [SchoolYearController::class, 'makeCurrent'])->name('school-years.current');
+
             // Fase 5: todas las solicitudes de las familias.
             Route::get('solicitudes', [AdminRequestController::class, 'index'])->name('requests.index');
 
