@@ -18,7 +18,13 @@ class School extends Model
 
     protected function casts(): array
     {
-        return ['type' => SchoolType::class];
+        return ['type' => SchoolType::class, 'renewal_year' => 'integer'];
+    }
+
+    // RF-36: ¿hay renovación de matrícula abierta?
+    public function renewalOpen(): bool
+    {
+        return $this->renewal_year !== null;
     }
 
     // RF-54: un colegio solo de primaria no tiene bitácora en ningún grupo.

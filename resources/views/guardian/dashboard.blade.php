@@ -22,6 +22,17 @@
                                 {{ $child->classroom?->name ?? 'Sin grupo asignado' }}
                             </p>
                         </div>
+                        {{-- RF-36: renovación de matrícula, cuando coordinación la abre. --}}
+                        @php($renewalYear = auth()->user()->school?->renewal_year)
+                        @if ($renewalYear && $child->classroom?->level !== \App\Enums\GradeLevel::Quinto)
+                            @if ($child->renewals->contains('year', $renewalYear))
+                                <span class="tag bg-ok-bg text-ok border border-ok">✓ Matrícula {{ $renewalYear }} renovada</span>
+                            @else
+                                <a href="{{ route('guardian.renewals.create', $child) }}" class="btn btn-sm">
+                                    Renovar matrícula {{ $renewalYear }}
+                                </a>
+                            @endif
+                        @endif
                         @if ($child->hasDailyLog())
                             <a href="{{ route('guardian.reports.index', $child) }}"
                                class="inline-block bg-indigo-600 text-white px-4 py-2 rounded">

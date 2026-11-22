@@ -35,6 +35,15 @@ enum GradeLevel: string
         return in_array($this, self::preschool(), true);
     }
 
+    // Nivel del año siguiente. 5.° no tiene: el estudiante termina primaria.
+    public function next(): ?self
+    {
+        $all = self::cases();
+        $i = array_search($this, $all, true);
+
+        return $all[$i + 1] ?? null;
+    }
+
     /** @return list<self> */
     public static function preschool(): array
     {
