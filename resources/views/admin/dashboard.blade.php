@@ -15,6 +15,17 @@
             @endforeach
         </section>
 
+        {{-- RF-34: enlace público para que las familias nuevas se inscriban. --}}
+        @if ($school = auth()->user()->school)
+            <section class="card">
+                <h3 class="text-lg font-bold text-ink">Enlace de inscripción</h3>
+                <p class="mt-1 text-sm text-soft">Compártelo con las familias nuevas. Las solicitudes llegan para que las revises.</p>
+                <p class="mt-2 break-all font-bold text-action">
+                    <a href="{{ route('enrollment.create', $school) }}" class="underline" target="_blank" rel="noopener">{{ route('enrollment.create', $school) }}</a>
+                </p>
+            </section>
+        @endif
+
         {{-- Avance de bitácoras de hoy, una barra por grupo. --}}
         <section class="card">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
