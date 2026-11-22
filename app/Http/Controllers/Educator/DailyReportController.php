@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Educator;
 use App\Actions\PublishDailyReport;
 use App\Enums\MealStatus;
 use App\Enums\Mood;
+use App\Enums\Role;
+use App\Enums\SchoolType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DailyReportRequest;
 use App\Models\Child;
+use App\Models\Classroom;
 use App\Models\DailyReport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -41,10 +44,17 @@ class DailyReportController extends Controller
 
         $sent = $children->filter(fn (Child $child) => $child->dailyReports->isNotEmpty())->count();
 
+        // Grupos sin nivel: en "jardín y primaria" no llevan bitácora hasta que coordinación
+        // les asigne el nivel. Se avisa para que la pantalla vacía no confunda.
+        $groupsWithoutLevel = $user->role === Role::Admin
+            ? Classroom::whereNull('level')->orderBy('name')->get()
+            : $user->classrooms()->whereNull('level')->orderBy('name')->get();
+
         return view('educator.reports.index', [
             'children' => $children,
             'sent' => $sent,
             'total' => $children->count(),
+            'groupsWithoutLevel' => $user->school?->type === SchoolType::Both ? $groupsWithoutLevel : collect(),
         ]);
     }
 
