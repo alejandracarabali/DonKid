@@ -38,6 +38,12 @@ class School extends Model
         $this->forceFill(['suspended_at' => null])->save();
     }
 
+    // Cada colegio nuevo arranca con materias, dimensiones y escala de desempeños por defecto.
+    protected static function booted(): void
+    {
+        static::created(fn (School $school) => \App\Support\AcademicDefaults::seed($school));
+    }
+
     // RF-36: ¿hay renovación de matrícula abierta?
     public function renewalOpen(): bool
     {

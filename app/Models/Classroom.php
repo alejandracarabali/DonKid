@@ -69,6 +69,18 @@ class Classroom extends Model
         return $this->belongsToMany(User::class, 'classroom_user')->withTimestamps();
     }
 
+    // RF-04: materias (o dimensiones) del grupo, con el docente que dicta cada una.
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class)->withPivot('educator_id')->withTimestamps()->orderBy('position');
+    }
+
+    // En preescolar se evalúan dimensiones; en primaria, materias.
+    public function subjectKind(): \App\Enums\SubjectKind
+    {
+        return $this->level?->isPreschool() ? \App\Enums\SubjectKind::Dimension : \App\Enums\SubjectKind::Subject;
+    }
+
     public function activities(): HasMany
     {
         return $this->hasMany(Activity::class);
