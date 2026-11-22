@@ -106,7 +106,10 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->name('educator.')
         ->group(function () {
             // La docente no tiene "Inicio": su pantalla principal es Bitácora.
-            Route::redirect('/', '/docente/bitacora')->name('dashboard');
+            // El director de grupo empieza en la Bitácora; el docente solo por materia, en Grupos.
+            Route::get('/', fn () => redirect()->route(
+                \App\Support\Navigation::offersDailyLog(request()->user()) ? 'educator.reports.index' : 'educator.groups.index'
+            ))->name('dashboard');
 
             // Bitácora
             Route::get('/bitacora', [DailyReportController::class, 'index'])->name('reports.index');

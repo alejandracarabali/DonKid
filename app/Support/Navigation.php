@@ -55,7 +55,17 @@ class Navigation
 
     public static function offersDailyLog(User $user): bool
     {
-        return $user->school?->offersDailyLog() ?? true;
+        if (! ($user->school?->offersDailyLog() ?? true)) {
+            return false;
+        }
+
+        // RF-61: un docente solo por materia (tiene grupos, pero no dirige ninguno) no lleva bitácora.
+        // Sin ningún grupo todavía, sí la ve: allí le explica que aún no tiene estudiantes.
+        if ($user->role !== Role::Educator || ! $user->classrooms()->exists()) {
+            return true;
+        }
+
+        return $user->ledClassrooms()->exists();
     }
 
     /**

@@ -30,7 +30,8 @@ class DailyReportController extends Controller
         $children = Child::query()
             ->when(
                 $user->role->value !== 'admin',
-                fn ($q) => $q->whereIn('classroom_id', $user->classrooms()->pluck('classrooms.id'))
+                // RF-61: la docente ve solo los grupos que dirige.
+                fn ($q) => $q->whereIn('classroom_id', $user->ledClassrooms()->pluck('classrooms.id'))
             )
             ->with(['classroom.school', 'school', 'dailyReports' => fn ($q) => $q->whereDate('report_date', today())])
             ->orderBy('first_name')

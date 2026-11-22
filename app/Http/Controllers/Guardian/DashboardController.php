@@ -12,7 +12,7 @@ class DashboardController extends Controller
     {
         // Privacidad por diseño: solo los hijos vinculados a esta familia.
         $children = $request->user()->children()
-            ->with(['classroom.school', 'school', 'renewals'])
+            ->with(['classroom.school', 'classroom.director', 'school', 'renewals'])
             ->orderBy('first_name')
             ->get();
 

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\GradeLevel;
+use App\Enums\Role;
 use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,6 +30,8 @@ class ClassroomRequest extends FormRequest
             // RF-54: el nivel define si el grupo lleva bitácora. Solo se aceptan
             // los niveles que corresponden al tipo de institución.
             'level' => ['required', Rule::enum(GradeLevel::class)->only($this->allowedLevels())],
+            // RF-61: el director debe ser un docente de este colegio.
+            'director_id' => ['nullable', $this->existsInSchool('users')->where('role', Role::Educator->value)],
         ];
     }
 
@@ -47,6 +50,7 @@ class ClassroomRequest extends FormRequest
             'name.max' => 'El nombre es muy largo. Máximo 60 letras.',
             'level.required' => 'Elige el nivel del grupo.',
             'level.enum' => 'Ese nivel no existe en tu institución. Elige otro.',
+            'director_id.exists' => 'Elige un docente de tu colegio como director de grupo.',
         ];
     }
 }
