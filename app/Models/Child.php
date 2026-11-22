@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @mixin IdeHelperChild
@@ -84,6 +85,12 @@ class Child extends Model
         return $this->belongsToMany(User::class, 'child_guardian')
             ->withPivot('relationship')
             ->withTimestamps();
+    }
+
+    // RF-38: ficha de salud (datos sensibles, en tabla aparte).
+    public function healthRecord(): HasOne
+    {
+        return $this->hasOne(ChildHealthRecord::class);
     }
 
     public function dailyReports(): HasMany

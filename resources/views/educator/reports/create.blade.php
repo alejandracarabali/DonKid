@@ -15,6 +15,29 @@
     @endphp
 
     <div class="mx-auto max-w-3xl px-4 py-4 sm:px-6 lg:px-0">
+        {{-- RF-38: lo que la docente debe tener a mano mientras cuida al niño. --}}
+        @php($health = $child->healthRecord)
+        @if ($child->allergies || $health?->conditions || $health?->medications || $health?->emergency_contact_phone)
+            <div class="card mb-4 space-y-1" aria-label="Ficha de salud">
+                <h2 class="text-[17px] font-medium">Salud</h2>
+                @if ($child->allergies)
+                    <p><span class="tag bg-bad-bg text-bad border border-bad">⚠ Alergia</span> {{ $child->allergies }}</p>
+                @endif
+                @if ($health?->conditions)
+                    <p><strong>Condiciones:</strong> {{ $health->conditions }}</p>
+                @endif
+                @if ($health?->medications)
+                    <p><strong>Medicamentos:</strong> {{ $health->medications }}</p>
+                @endif
+                @if ($health?->emergency_contact_phone)
+                    <p class="text-sm text-soft">
+                        EPS {{ $health->eps ?: '—' }} · Emergencia: {{ $health->emergency_contact_name }}
+                        <a href="tel:{{ $health->emergency_contact_phone }}" class="font-bold text-action underline">{{ $health->emergency_contact_phone }}</a>
+                    </p>
+                @endif
+            </div>
+        @endif
+
         {{-- @js convierte valores PHP a JavaScript de forma segura (comillas, tildes, etc.). --}}
         <form method="POST" action="{{ route('educator.reports.store', $child) }}"
               class="card space-y-5"
