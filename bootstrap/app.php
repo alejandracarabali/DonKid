@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
         'guardian.active' => \App\Http\Middleware\EnsureGuardianIsActive::class,
         'school.active' => \App\Http\Middleware\EnsureSchoolIsActive::class,
+        'two-factor' => \App\Http\Middleware\EnsureTwoFactor::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

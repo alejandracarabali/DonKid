@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\EnrollmentApplicationController;
 use App\Http\Controllers\Platform\SchoolController as PlatformSchoolController;
+use App\Http\Controllers\Platform\TwoFactorController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,11 +45,20 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->prefix('plataforma')
         ->name('platform.')
         ->group(function () {
-            Route::get('/colegios', [PlatformSchoolController::class, 'index'])->name('schools.index');
-            Route::get('/colegios/nuevo', [PlatformSchoolController::class, 'create'])->name('schools.create');
-            Route::post('/colegios', [PlatformSchoolController::class, 'store'])->name('schools.store');
-            Route::post('/colegios/{school}/suspender', [PlatformSchoolController::class, 'suspend'])->name('schools.suspend');
-            Route::post('/colegios/{school}/reactivar', [PlatformSchoolController::class, 'reactivate'])->name('schools.reactivate');
+            // Verificación en dos pasos: estas rutas quedan FUERA de 'two-factor' (si no, bucle infinito).
+            Route::get('/seguridad/activar', [TwoFactorController::class, 'setup'])->name('two-factor.setup');
+            Route::post('/seguridad/activar', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+            Route::get('/seguridad/codigo', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
+            Route::post('/seguridad/codigo', [TwoFactorController::class, 'verify'])
+                ->middleware('throttle:5,1')->name('two-factor.verify'); // máximo 5 intentos por minuto
+
+            Route::middleware('two-factor')->group(function () {
+                Route::get('/colegios', [PlatformSchoolController::class, 'index'])->name('schools.index');
+                Route::get('/colegios/nuevo', [PlatformSchoolController::class, 'create'])->name('schools.create');
+                Route::post('/colegios', [PlatformSchoolController::class, 'store'])->name('schools.store');
+                Route::post('/colegios/{school}/suspender', [PlatformSchoolController::class, 'suspend'])->name('schools.suspend');
+                Route::post('/colegios/{school}/reactivar', [PlatformSchoolController::class, 'reactivate'])->name('schools.reactivate');
+            });
         });
 
 

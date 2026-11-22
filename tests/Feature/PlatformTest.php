@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Role;
+use App\Http\Middleware\EnsureTwoFactor;
 use App\Enums\SchoolType;
 use App\Models\Child;
 use App\Models\Classroom;
@@ -8,6 +9,15 @@ use App\Models\School;
 use App\Models\User;
 
 // RF-55 a RF-57: superadministrador de la plataforma DonKid.
+
+// Superadmin con la verificación en dos pasos configurada y ya superada en esta sesión.
+function superAdminVerified(): User
+{
+    $user = User::factory()->superAdmin()->withTwoFactor()->create();
+    test()->withSession([EnsureTwoFactor::SESSION_KEY => $user->id]);
+
+    return $user;
+}
 
 it('crea el superadministrador por consola, sin colegio y con clave temporal', function () {
     $this->artisan('donkid:superadmin', ['email' => 'equipo@donkid.co'])
@@ -28,7 +38,7 @@ it('el comando rechaza un correo que ya existe', function () {
 });
 
 it('el superadministrador llega a Colegios al iniciar sesión', function () {
-    $this->actingAs(User::factory()->superAdmin()->create())
+    $this->actingAs(superAdminVerified())
         ->get('/dashboard')
         ->assertRedirect(route('platform.schools.index'));
 });
@@ -38,7 +48,7 @@ it('lista los colegios con estudiantes activos, sin datos personales', function 
     Child::factory()->count(2)->create(['first_name' => 'Secreto']);
     Child::factory()->create()->withdraw(today()->toDateString(), null);
 
-    $this->actingAs(User::factory()->superAdmin()->create())
+    $this->actingAs(superAdminVerified())
         ->get(route('platform.schools.index'))
         ->assertOk()
         ->assertSee($colegio->name)
@@ -47,7 +57,7 @@ it('lista los colegios con estudiantes activos, sin datos personales', function 
 });
 
 it('crea un colegio con su primera cuenta de coordinación', function () {
-    $this->actingAs(User::factory()->superAdmin()->create())
+    $this->actingAs(superAdminVerified())
         ->post(route('platform.schools.store'), [
             'name' => 'Jardín Los Pinos',
             'type' => 'kindergarten',
@@ -67,7 +77,7 @@ it('crea un colegio con su primera cuenta de coordinación', function () {
 });
 
 it('no crea un colegio con un slug repetido ni un correo ocupado', function () {
-    $superAdmin = User::factory()->superAdmin()->create();
+    $superAdmin = superAdminVerified();
     User::factory()->admin()->create(['email' => 'ocupado@correo.co']);
     $existente = School::query()->orderBy('id')->first();
 
@@ -82,7 +92,7 @@ it('al suspender un colegio nadie de él puede ingresar, y sus datos se conserva
     $docente = User::factory()->educator()->create();
     Child::factory()->create();
 
-    $this->actingAs(User::factory()->superAdmin()->create())
+    $this->actingAs(superAdminVerified())
         ->post(route('platform.schools.suspend', $school));
 
     $this->actingAs($docente->fresh())
@@ -99,7 +109,7 @@ it('al reactivar, el colegio vuelve a ingresar', function () {
     $school->suspend();
     $admin = User::factory()->admin()->create();
 
-    $this->actingAs(User::factory()->superAdmin()->create())
+    $this->actingAs(superAdminVerified())
         ->post(route('platform.schools.reactivate', $school));
 
     $this->actingAs($admin->fresh())->get(route('admin.dashboard'))->assertOk();
@@ -115,21 +125,21 @@ it('suspender un colegio no afecta a otro', function () {
 
 describe('el superadministrador no ve datos de los colegios', function () {
     it('no entra a las zonas de coordinación, docente ni familia', function (string $url) {
-        $this->actingAs(User::factory()->superAdmin()->create())->get($url)->assertForbidden();
+        $this->actingAs(superAdminVerified())->get($url)->assertForbidden();
     })->with(['/admin', '/admin/ninos', '/admin/inscripciones', '/docente/bitacora', '/familia']);
 
     it('las consultas de datos de colegio no le devuelven nada', function () {
         Child::factory()->count(3)->create();
         Classroom::factory()->create();
 
-        $this->actingAs(User::factory()->superAdmin()->create());
+        $this->actingAs(superAdminVerified());
 
         expect(Child::count())->toBe(0)
             ->and(Classroom::count())->toBe(0);
     });
 
     it('ninguna policy le da permiso', function () {
-        $superAdmin = User::factory()->superAdmin()->create();
+        $superAdmin = superAdminVerified();
         $nino = Child::withoutGlobalScopes()->find(Child::factory()->create()->id);
 
         expect($superAdmin->can('view', $nino))->toBeFalse();
@@ -150,7 +160,7 @@ describe('buscador de colegios', function () {
     });
 
     it('busca por nombre', function () {
-        $this->actingAs(User::factory()->superAdmin()->create())
+        $this->actingAs(superAdminVerified())
             ->get(route('platform.schools.index', ['q' => 'pinos']))
             ->assertOk()
             ->assertSee('Jardín Los Pinos')
@@ -158,14 +168,14 @@ describe('buscador de colegios', function () {
     });
 
     it('busca por slug', function () {
-        $this->actingAs(User::factory()->superAdmin()->create())
+        $this->actingAs(superAdminVerified())
             ->get(route('platform.schools.index', ['q' => 'san-rafael']))
             ->assertSee('Colegio San Rafael')
             ->assertDontSee('Jardín Los Pinos');
     });
 
     it('filtra por estado', function () {
-        $superAdmin = User::factory()->superAdmin()->create();
+        $superAdmin = superAdminVerified();
 
         $this->actingAs($superAdmin)->get(route('platform.schools.index', ['estado' => 'suspendidos']))
             ->assertSee('Gimnasio Pequeños')
@@ -177,7 +187,7 @@ describe('buscador de colegios', function () {
     });
 
     it('avisa cuando no hay resultados', function () {
-        $this->actingAs(User::factory()->superAdmin()->create())
+        $this->actingAs(superAdminVerified())
             ->get(route('platform.schools.index', ['q' => 'inexistente']))
             ->assertSee('No hay colegios que coincidan con la búsqueda');
     });
@@ -185,7 +195,7 @@ describe('buscador de colegios', function () {
     it('pagina de a 20 y conserva la búsqueda entre páginas', function () {
         School::factory()->count(25)->sequence(fn ($s) => ['name' => 'Jardín Número '.$s->index, 'slug' => 'jardin-numero-'.$s->index])->create();
 
-        $this->actingAs(User::factory()->superAdmin()->create())
+        $this->actingAs(superAdminVerified())
             ->get(route('platform.schools.index', ['q' => 'número']))
             ->assertSee('25 colegios')
             ->assertSee('q=n%C3%BAmero', false);
