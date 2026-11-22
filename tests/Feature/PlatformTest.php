@@ -141,3 +141,53 @@ it('solo el superadministrador entra a la plataforma', function (string $role) {
         ->get(route('platform.schools.index'))
         ->assertForbidden();
 })->with(['admin', 'educator', 'guardian']);
+
+describe('buscador de colegios', function () {
+    beforeEach(function () {
+        School::factory()->create(['name' => 'Jardín Los Pinos', 'slug' => 'jardin-los-pinos']);
+        School::factory()->create(['name' => 'Colegio San Rafael', 'slug' => 'san-rafael']);
+        School::factory()->create(['name' => 'Gimnasio Pequeños', 'slug' => 'gimnasio-pequenos', 'suspended_at' => now()]);
+    });
+
+    it('busca por nombre', function () {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('platform.schools.index', ['q' => 'pinos']))
+            ->assertOk()
+            ->assertSee('Jardín Los Pinos')
+            ->assertDontSee('Colegio San Rafael');
+    });
+
+    it('busca por slug', function () {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('platform.schools.index', ['q' => 'san-rafael']))
+            ->assertSee('Colegio San Rafael')
+            ->assertDontSee('Jardín Los Pinos');
+    });
+
+    it('filtra por estado', function () {
+        $superAdmin = User::factory()->superAdmin()->create();
+
+        $this->actingAs($superAdmin)->get(route('platform.schools.index', ['estado' => 'suspendidos']))
+            ->assertSee('Gimnasio Pequeños')
+            ->assertDontSee('Jardín Los Pinos');
+
+        $this->actingAs($superAdmin)->get(route('platform.schools.index', ['estado' => 'activos']))
+            ->assertSee('Jardín Los Pinos')
+            ->assertDontSee('Gimnasio Pequeños');
+    });
+
+    it('avisa cuando no hay resultados', function () {
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('platform.schools.index', ['q' => 'inexistente']))
+            ->assertSee('No hay colegios que coincidan con la búsqueda');
+    });
+
+    it('pagina de a 20 y conserva la búsqueda entre páginas', function () {
+        School::factory()->count(25)->sequence(fn ($s) => ['name' => 'Jardín Número '.$s->index, 'slug' => 'jardin-numero-'.$s->index])->create();
+
+        $this->actingAs(User::factory()->superAdmin()->create())
+            ->get(route('platform.schools.index', ['q' => 'número']))
+            ->assertSee('25 colegios')
+            ->assertSee('q=n%C3%BAmero', false);
+    });
+});
