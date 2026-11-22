@@ -7,6 +7,7 @@ use App\Http\Controllers\Guardian\AnnouncementController as GuardianAnnouncement
 use App\Http\Controllers\Guardian\DailyReportController as GuardianReportController;
 use App\Http\Controllers\Educator\DailyReportController;
 use App\Http\Controllers\Admin\EducatorController;
+use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -66,6 +67,12 @@ Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(functi
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            // RF-35: bandeja de inscripciones.
+            Route::get('inscripciones', [EnrollmentController::class, 'index'])->name('enrollments.index');
+            Route::get('inscripciones/{application}', [EnrollmentController::class, 'show'])->name('enrollments.show');
+            Route::get('inscripciones/{application}/documentos/{document}', [EnrollmentController::class, 'document'])->name('enrollments.document');
+            Route::post('inscripciones/{application}/aprobar', [EnrollmentController::class, 'approve'])->name('enrollments.approve');
+            Route::post('inscripciones/{application}/rechazar', [EnrollmentController::class, 'reject'])->name('enrollments.reject');
             Route::resource('docentes', EducatorController::class)
             ->parameters(['docentes' => 'educator'])
             ->except(['show'])
