@@ -80,6 +80,15 @@ class User extends Authenticatable
     }
 
     // Una educadora atiende varios grupos.
+    // RF-61: grupos que este docente dirige (o, si el grupo aún no tiene director,
+    // en los que está asignado). Son los grupos de los que lleva la bitácora.
+    public function ledClassrooms(): BelongsToMany
+    {
+        return $this->classrooms()->where(fn ($q) => $q
+            ->where('classrooms.director_id', $this->id)
+            ->orWhereNull('classrooms.director_id'));
+    }
+
     public function classrooms(): BelongsToMany
     {
         return $this->belongsToMany(Classroom::class, 'classroom_user')->withTimestamps();

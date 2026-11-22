@@ -20,6 +20,10 @@
                             <p class="font-medium">{{ $child->first_name }} {{ $child->last_name }}</p>
                             <p class="text-sm text-gray-600">
                                 {{ $child->classroom?->name ?? 'Sin grupo asignado' }}
+                                {{-- RF-62: la familia sabe quién es el responsable del grupo. --}}
+                                @if ($child->classroom?->director)
+                                    · Director de grupo: {{ $child->classroom->director->name }}
+                                @endif
                             </p>
                         </div>
                         {{-- RF-36: renovación de matrícula, cuando coordinación la abre. --}}
