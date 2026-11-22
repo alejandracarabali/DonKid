@@ -14,8 +14,12 @@ class ClassroomController extends Controller
     // con UNA sola consulta (evita el problema N+1).
     public function index()
     {
-        $classrooms = Classroom::with('director')->withCount('children')->orderBy('name')->get();
-
+        $classrooms = Classroom::with('director')->withCount('children')->orderBy('name')->get()
+            // Orden escolar (Párvulos → 5.°); los grupos sin nivel van al final.
+            // Dentro del mismo nivel se mantiene el orden por nombre (3.° A, 3.° B).
+            ->sortBy(fn (Classroom $c) => $c->level?->position() ?? PHP_INT_MAX)
+            ->values();
+            
         return view('admin.classrooms.index', compact('classrooms'));
     }
 
