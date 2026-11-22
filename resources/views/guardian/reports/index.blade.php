@@ -14,7 +14,10 @@
                     </p>
                     <div class="flex flex-wrap gap-4 mt-2 text-lg">
                         @if ($report->mood)
-                            <span>{{ $report->mood->icon() }} {{ $report->mood->label() }}</span>
+                            <span class="inline-flex items-center gap-2">
+                                <img src="{{ $report->mood->image() }}" alt="" width="40" height="40" class="h-10 w-10 object-contain">
+                                {{ $report->mood->label() }}
+                            </span>
                         @endif
                         @if ($report->meal_status)
                             <span>{{ $report->meal_status->icon() }} {{ $report->meal_status->label() }}</span>

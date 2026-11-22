@@ -2,10 +2,13 @@
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Niños</h2>
-            <a href="{{ route('admin.children.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm">
-                Nuevo niño
-            </a>
+            <div class="flex items-center gap-4">
+                <a href="{{ route('admin.children.withdrawn') }}" class="text-sm underline">Ver retirados</a>
+                <a href="{{ route('admin.children.create') }}"
+                   class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm">
+                    Nuevo niño
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -29,14 +32,8 @@
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <a href="{{ route('admin.children.edit', $child) }}" class="text-sm underline">Editar</a>
-
-                        <form method="POST" action="{{ route('admin.children.destroy', $child) }}"
-                              onsubmit="return confirm('¿Quitar a {{ $child->first_name }}? Esto no se puede deshacer.')">
-                            @csrf
-                            @method('DELETE')
-                            <button class="text-sm text-red-600 underline">Quitar</button>
-                        </form>
+                        {{-- Retirar está dentro de Editar: pide fecha y motivo. --}}
+                        <a href="{{ route('admin.children.edit', $child) }}" class="text-sm underline">Editar o retirar</a>
                     </div>
                 </div>
             @empty

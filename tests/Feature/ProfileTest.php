@@ -50,36 +50,23 @@ test('email verification status is unchanged when the email address is unchanged
     $this->assertNotNull($user->refresh()->email_verified_at);
 });
 
-test('user can delete their account', function () {
-    $user = User::factory()->create();
+// Nadie borra su propia cuenta: las cuentas las administra coordinación.
+test('nadie puede borrar su propia cuenta', function (string $role) {
+    $user = User::factory()->{$role}()->create();
 
-    $response = $this
-        ->actingAs($user)
-        ->delete('/profile', [
-            'password' => 'password',
-        ]);
+    $this->actingAs($user)
+        ->delete('/profile', ['password' => 'password'])
+        ->assertStatus(405); // 405 = la ruta /profile existe, pero no acepta DELETE
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
+    expect($user->fresh())->not->toBeNull();
+})->with(['admin', 'educator', 'guardian']);
 
-    $this->assertGuest();
-    $this->assertNull($user->fresh());
-});
+test('el perfil no muestra la opción de borrar la cuenta', function () {
+    $user = User::factory()->guardian()->create();
 
-test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
-
-    $response
-        ->assertSessionHasErrorsIn('userDeletion', 'password')
-        ->assertRedirect('/profile');
-
-    $this->assertNotNull($user->fresh());
+    $this->actingAs($user)
+        ->get('/profile')
+        ->assertOk()
+        ->assertDontSee('Borrar cuenta')
+        ->assertSee('escríbele a coordinación');
 });

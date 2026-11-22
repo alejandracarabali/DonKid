@@ -99,6 +99,13 @@ class GuardianController extends Controller
             $sync[$childId] = ['relationship' => $data['relationships'][$childId] ?? null];
         }
 
+        // RF-53: los niños retirados no aparecen en el formulario; sin esto, sync()
+        // borraría su vínculo con el acudiente y se perdería quién era su familia.
+        $withdrawn = $guardian->children()->withdrawn()->get();
+        foreach ($withdrawn as $child) {
+            $sync[$child->id] = ['relationship' => $child->pivot->relationship];
+        }
+
         $guardian->children()->sync($sync);
     }
 }

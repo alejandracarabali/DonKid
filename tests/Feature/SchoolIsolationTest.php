@@ -55,7 +55,7 @@ test('un grupo nuevo queda en el colegio de quien lo crea', function () {
     $admin = User::factory()->admin()->create(['school_id' => $otro->id]);
 
     $this->actingAs($admin)
-        ->post(route('admin.classrooms.store'), ['name' => 'Girasoles'])
+        ->post(route('admin.classrooms.store'), ['name' => 'Girasoles', 'level' => 'jardin'])
         ->assertRedirect(route('admin.classrooms.index'));
 
     $grupo = Classroom::withoutGlobalScopes()->where('name', 'Girasoles')->first();

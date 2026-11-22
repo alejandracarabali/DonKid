@@ -22,10 +22,12 @@
                                 {{ $child->classroom?->name ?? 'Sin grupo asignado' }}
                             </p>
                         </div>
-                        <a href="{{ route('guardian.reports.index', $child) }}"
-                           class="inline-block bg-indigo-600 text-white px-4 py-2 rounded">
-                            Ver la bitácora de {{ $child->first_name }}
-                        </a>
+                        @if ($child->hasDailyLog())
+                            <a href="{{ route('guardian.reports.index', $child) }}"
+                               class="inline-block bg-indigo-600 text-white px-4 py-2 rounded">
+                                Ver la bitácora de {{ $child->first_name }}
+                            </a>
+                        @endif
                     </div>
                 @empty
                     <div class="bg-white p-4 rounded shadow text-gray-700">

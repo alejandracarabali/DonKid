@@ -30,13 +30,14 @@
             <div>
                 <h2 id="lbl-mood" class="mb-2 text-[17px] font-medium">Ánimo</h2>
                 <input type="hidden" name="mood" :value="mood">
-                <div class="grid grid-cols-3 gap-2 sm:grid-cols-5" role="group" aria-labelledby="lbl-mood">
+                <div class="grid grid-cols-3 gap-2 sm:grid-cols-6" role="group" aria-labelledby="lbl-mood">
                     @foreach ($moods as $m)
                         <button type="button" class="opt"
                                 @click="mood = '{{ $m->value }}'"
                                 aria-pressed="{{ $savedMood === $m->value ? 'true' : 'false' }}"
                                 :aria-pressed="(mood === '{{ $m->value }}').toString()">
-                            <span class="text-3xl" aria-hidden="true">{{ $m->icon() }}</span>
+                            {{-- alt vacío: la etiqueta de texto ya dice el ánimo; así el lector de pantalla no lo repite. --}}
+                            <img src="{{ $m->image() }}" alt="" width="56" height="56" class="h-14 w-14 object-contain">
                             {{ $m->label() }}
                         </button>
                     @endforeach

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\SchoolType;
 use App\Models\Concerns\BelongsToSchool;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +18,8 @@ class Child extends Model
 {
     use HasFactory, BelongsToSchool;
 
+    // withdrawn_at y withdrawal_reason NO son asignables en bloque:
+    // solo se cambian con withdraw() y reactivate().
     protected $fillable = [
         'classroom_id', 'first_name', 'last_name', 'birth_date', 'allergies',
     ];
@@ -23,7 +27,48 @@ class Child extends Model
     // Laravel convierte el texto de la BD en un objeto fecha (Carbon).
     protected function casts(): array
     {
-        return ['birth_date' => 'date'];
+        return ['birth_date' => 'date', 'withdrawn_at' => 'date'];
+    }
+
+    // RF-53: por defecto, toda consulta de niños trae solo a los activos.
+    // Así un retirado desaparece de listas de grupo, bitácora, avisos y de la vista
+    // de la familia sin tocar cada consulta. Para verlos: withoutGlobalScope('active').
+    protected static function booted(): void
+    {
+        static::addGlobalScope('active', function (Builder $query) {
+            $query->whereNull($query->qualifyColumn('withdrawn_at'));
+        });
+    }
+
+    // Solo los retirados (usado por coordinación).
+    public function scopeWithdrawn(Builder $query): Builder
+    {
+        return $query->withoutGlobalScope('active')->whereNotNull($query->qualifyColumn('withdrawn_at'));
+    }
+
+    // RF-54: el niño lleva bitácora si su grupo la lleva.
+    // Sin grupo: solo en un colegio que sea únicamente jardín.
+    public function hasDailyLog(): bool
+    {
+        return $this->classroom
+            ? $this->classroom->hasDailyLog()
+            : $this->school?->type === SchoolType::Kindergarten;
+    }
+
+    public function isWithdrawn(): bool
+    {
+        return $this->withdrawn_at !== null;
+    }
+
+    // Inhabilita al niño. Nada se borra: historial, bitácora y vínculos se conservan.
+    public function withdraw(string $date, ?string $reason): void
+    {
+        $this->forceFill(['withdrawn_at' => $date, 'withdrawal_reason' => $reason])->save();
+    }
+
+    public function reactivate(): void
+    {
+        $this->forceFill(['withdrawn_at' => null, 'withdrawal_reason' => null])->save();
     }
 
     // Un niño pertenece a un grupo.
@@ -44,6 +89,12 @@ class Child extends Model
     public function dailyReports(): HasMany
     {
         return $this->hasMany(DailyReport::class);
+    }
+
+        // Uso: $child->attendances
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
     }
 
     // Pertenece a un colegio. Uso: $modelo->school->name

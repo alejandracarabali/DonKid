@@ -21,6 +21,12 @@ class School extends Model
         return ['type' => SchoolType::class];
     }
 
+    // RF-54: un colegio solo de primaria no tiene bitácora en ningún grupo.
+    public function offersDailyLog(): bool
+    {
+        return $this->type !== SchoolType::Primary;
+    }
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

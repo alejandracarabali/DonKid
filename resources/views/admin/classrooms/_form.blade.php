@@ -12,3 +12,19 @@
         :value="old('age_range', $classroom->age_range ?? '')" />
     <x-input-error :messages="$errors->get('age_range')" class="mt-2" />
 </div>
+
+{{-- RF-54: el nivel define, entre otras cosas, si el grupo lleva bitácora diaria. --}}
+@php($levels = \App\Enums\GradeLevel::forSchool(auth()->user()->school?->type))
+<div class="mt-4">
+    <x-input-label for="level" value="Nivel" />
+    <select id="level" name="level" required
+            class="block mt-1 w-full border-gray-300 rounded-md shadow-sm">
+        <option value="">Elige el nivel</option>
+        @foreach ($levels as $level)
+            <option value="{{ $level->value }}" @selected(old('level', isset($classroom) ? $classroom->level?->value : null) === $level->value)>
+                {{ $level->label() }}
+            </option>
+        @endforeach
+    </select>
+    <x-input-error :messages="$errors->get('level')" class="mt-2" />
+</div>

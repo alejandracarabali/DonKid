@@ -21,14 +21,19 @@ class DailyReportController extends Controller
     {
         $user = $request->user();
 
+        // RF-54: un colegio solo de primaria no tiene bitácora.
+        abort_unless($user->school?->offersDailyLog() ?? true, 404);
+
         $children = Child::query()
             ->when(
                 $user->role->value !== 'admin',
                 fn ($q) => $q->whereIn('classroom_id', $user->classrooms()->pluck('classrooms.id'))
             )
-            ->with(['dailyReports' => fn ($q) => $q->whereDate('report_date', today())])
+            ->with(['classroom.school', 'school', 'dailyReports' => fn ($q) => $q->whereDate('report_date', today())])
             ->orderBy('first_name')
             ->get()
+            // En "jardín y primaria" solo aparecen los niños de grupos de preescolar.
+            ->filter(fn (Child $child) => $child->hasDailyLog())
             // Pendientes primero: false (sin reporte) va antes que true. Dentro de cada
             // grupo se conserva el orden alfabético porque el ordenamiento es estable.
             ->sortBy(fn (Child $child) => $child->dailyReports->isNotEmpty())
