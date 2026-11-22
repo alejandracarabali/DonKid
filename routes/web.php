@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\ChildController as AdminChildController;
 use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\EnrollmentApplicationController;
+use App\Http\Controllers\Platform\SchoolController as PlatformSchoolController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,20 @@ Route::middleware('auth')->group(function () {
     Route::put('/cambiar-clave', [ForcePasswordController::class, 'update'])->name('password.force.update');
 });
 
-Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active'])->group(function () {
+
+    // RF-55 a RF-57: zona del superadministrador (equipo DonKid).
+    Route::middleware('role:superadmin')
+        ->prefix('plataforma')
+        ->name('platform.')
+        ->group(function () {
+            Route::get('/colegios', [PlatformSchoolController::class, 'index'])->name('schools.index');
+            Route::get('/colegios/nuevo', [PlatformSchoolController::class, 'create'])->name('schools.create');
+            Route::post('/colegios', [PlatformSchoolController::class, 'store'])->name('schools.store');
+            Route::post('/colegios/{school}/suspender', [PlatformSchoolController::class, 'suspend'])->name('schools.suspend');
+            Route::post('/colegios/{school}/reactivar', [PlatformSchoolController::class, 'reactivate'])->name('schools.reactivate');
+        });
+
 
     // Punto de entrada único: manda a cada rol a su zona.
     Route::get('/dashboard', function () {

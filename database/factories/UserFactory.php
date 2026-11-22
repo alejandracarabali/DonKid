@@ -58,4 +58,10 @@ class UserFactory extends Factory
     {
         return $this->state(fn () => ['role' => Role::Guardian]);
     }
+
+    // Superadministrador: sin colegio.
+    public function superAdmin(): static
+    {
+        return $this->state(fn () => ['role' => Role::SuperAdmin, 'school_id' => null]);
+    }
 }

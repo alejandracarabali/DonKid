@@ -8,6 +8,8 @@ enum Role: string
     case Admin = 'admin';
     case Educator = 'educator';
     case Guardian = 'guardian';
+    // Equipo de DonKid: administra colegios, nunca ve datos de niños ni familias.
+    case SuperAdmin = 'superadmin';
 
     // Texto para mostrar al usuario. Un solo lugar = UX Writing consistente.
     public function label(): string
@@ -16,6 +18,7 @@ enum Role: string
             self::Admin => 'Coordinación',
             self::Educator => 'Docente',
             self::Guardian => 'Familia',
+            self::SuperAdmin => 'Plataforma DonKid',
         };
     }
 
@@ -26,6 +29,7 @@ enum Role: string
             self::Admin => 'admin.dashboard',
             self::Educator => 'educator.dashboard',
             self::Guardian => 'guardian.dashboard',
+            self::SuperAdmin => 'platform.schools.index',
         };
     }
 }

@@ -41,6 +41,9 @@ class Navigation
                 self::item('Avisos', 'educator.announcements.create', 'educator.announcements.*'),
                 self::item('Perfil', 'profile.edit', 'profile.*'),
             ])),
+            Role::SuperAdmin => [
+                self::item('Colegios', 'platform.schools.index', 'platform.schools.*'),
+            ],
             Role::Guardian => [
                 self::item('Inicio', 'guardian.dashboard', 'guardian.dashboard'),
                 self::item('Avisos', 'guardian.announcements.index', 'guardian.announcements.*',
