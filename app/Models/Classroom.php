@@ -18,7 +18,7 @@ class Classroom extends Model
 {
     use HasFactory, BelongsToSchool;
 
-    protected $fillable = ['name', 'age_range', 'level'];
+    protected $fillable = ['name', 'age_range', 'level', 'director_id'];
 
     protected function casts(): array
     {
@@ -31,6 +31,22 @@ class Classroom extends Model
      * - Primaria: ninguno.
      * - Jardín y primaria: solo los grupos de preescolar (un grupo sin nivel, no).
      */
+    // RF-61: director de grupo (responsable del grupo ante las familias).
+    public function director(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'director_id');
+    }
+
+    // ¿Este docente puede llevar la bitácora y el observador del grupo?
+    // Si el grupo aún no tiene director, cualquiera de sus docentes (transición:
+    // los grupos existentes siguen funcionando hasta que coordinación lo asigne).
+    public function isLedBy(User $user): bool
+    {
+        return $this->director_id === null
+            ? $this->educators()->whereKey($user->id)->exists()
+            : $this->director_id === $user->id;
+    }
+
     public function hasDailyLog(): bool
     {
         return match ($this->school?->type) {

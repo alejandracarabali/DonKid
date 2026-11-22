@@ -24,6 +24,7 @@
                         <p class="font-medium">{{ $classroom->name }}</p>
                         <p class="text-sm text-gray-500">
                             {{ $classroom->age_range ?? 'Sin edades' }} · {{ $classroom->children_count }} niños
+                            · Director: {{ $classroom->director?->name ?? 'sin asignar' }}
                         </p>
                     </div>
 

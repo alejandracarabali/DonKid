@@ -34,7 +34,8 @@ class DailyReportPolicy
 
         return match ($user->role) {
             Role::Admin => true,
-            Role::Educator => $user->can('view', $child),
+            // RF-61: solo el director de grupo lleva la bitácora de su grupo.
+            Role::Educator => $child->classroom?->isLedBy($user) ?? false,
             Role::Guardian => false,
         };
     }
