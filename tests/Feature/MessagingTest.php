@@ -154,3 +154,19 @@ it('la docente tiene Mensajes en la barra en lugar de Perfil', function () {
 
     expect($labels)->toContain('Mensajes')->not->toContain('Perfil');
 });
+
+// Regresión: con APP_TIMEZONE=America/Bogota la fecha de entrega se guardaba en UTC
+// (5 horas adelante) y el mensaje no le aparecía al director.
+it('funciona igual si la app usa la hora de Colombia', function () {
+    config(['app.timezone' => 'America/Bogota']);
+    date_default_timezone_set('America/Bogota');
+    Carbon::setTestNow(bogota('2026-11-23 10:00'));
+    [$madre, $nino, $director] = familyAndDirector();
+
+    $this->actingAs($madre)->post(route('guardian.messages.store', $nino), ['body' => 'Hola']);
+
+    $this->actingAs($director)->get(route('educator.messages.index'))->assertSee('Ana')->assertSee('1 nuevo');
+
+    date_default_timezone_set('UTC');
+});
+

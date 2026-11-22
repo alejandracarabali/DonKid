@@ -10,7 +10,8 @@ use Illuminate\Support\Carbon;
  */
 class MessagingHours
 {
-    // Momento en que el docente verá un mensaje enviado ahora (se devuelve en UTC, como se guarda).
+    // Momento en que el docente verá un mensaje enviado ahora, en la zona horaria de la app
+    // (la misma de now()), para que la comparación con la base de datos sea consistente.
     public static function deliveryTime(?Carbon $now = null): Carbon
     {
         $local = ($now ?? now())->copy()->setTimezone(config('messaging.timezone'));
@@ -23,12 +24,13 @@ class MessagingHours
             $local->addDay()->setTime($opens, 0); // de noche: mañana a las 6:00
         }
 
-        return $local->utc();
+        // Eloquent guarda la fecha tal cual, sin convertir zonas: hay que devolverla en la zona de la app.
+        return $local->setTimezone(config('app.timezone'));
     }
 
     public static function isOpen(?Carbon $now = null): bool
     {
-        return self::deliveryTime($now)->equalTo(($now ?? now())->copy()->utc());
+        return self::deliveryTime($now)->equalTo($now ?? now());
     }
 
     // "6:00 a. m." para mostrarlo a la familia.
