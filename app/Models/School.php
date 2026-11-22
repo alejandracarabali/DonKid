@@ -14,11 +14,28 @@ class School extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'type'];
+    // suspended_at no es asignable: solo cambia con suspend() y reactivate().
+    protected $fillable = ['name', 'slug', 'type', 'plan'];
 
     protected function casts(): array
     {
-        return ['type' => SchoolType::class, 'renewal_year' => 'integer'];
+        return ['type' => SchoolType::class, 'renewal_year' => 'integer', 'suspended_at' => 'datetime'];
+    }
+
+    // RF-56: un colegio suspendido conserva sus datos, pero nadie de él puede ingresar.
+    public function isSuspended(): bool
+    {
+        return $this->suspended_at !== null;
+    }
+
+    public function suspend(): void
+    {
+        $this->forceFill(['suspended_at' => now()])->save();
+    }
+
+    public function reactivate(): void
+    {
+        $this->forceFill(['suspended_at' => null])->save();
     }
 
     // RF-36: ¿hay renovación de matrícula abierta?
