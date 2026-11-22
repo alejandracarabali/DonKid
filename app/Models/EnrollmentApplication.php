@@ -46,6 +46,12 @@ class EnrollmentApplication extends Model
         return $this->belongsTo(School::class);
     }
 
+    // Niño creado al aprobar (RF-35). Sin el scope 'active': si se retira, el vínculo sigue.
+    public function child(): BelongsTo
+    {
+        return $this->belongsTo(Child::class)->withoutGlobalScope('active');
+    }
+
     public function documents(): HasMany
     {
         return $this->hasMany(EnrollmentDocument::class);

@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use App\Enums\EnrollmentStatus;
 use App\Enums\Role;
+use App\Models\EnrollmentApplication;
 use App\Models\User;
 
 /**
@@ -21,6 +23,9 @@ class Navigation
                 self::item('Inicio', 'admin.dashboard', 'admin.dashboard'),
                 self::item('Grupos', 'admin.classrooms.index', 'admin.classrooms.*'),
                 self::item('Estudiantes', 'admin.children.index', 'admin.children.*'),
+                self::item('Inscripciones', 'admin.enrollments.index', 'admin.enrollments.*',
+                    EnrollmentApplication::where('status', EnrollmentStatus::Pending)->count()),
+                self::item('Renovaciones', 'admin.renewals.index', 'admin.renewals.*'),
                 self::item('Familias', 'admin.guardians.index', 'admin.guardians.*'),
                 self::item('Docentes', 'admin.educators.index', 'admin.educators.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
