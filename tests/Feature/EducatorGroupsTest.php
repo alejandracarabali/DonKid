@@ -21,7 +21,7 @@ test('la docente ve la barra con las 5 pestañas del diseño', function () {
     $this->actingAs(User::factory()->educator()->create())
         ->get(route('educator.reports.index'))
         ->assertOk()
-        ->assertSeeInOrder(['Bitácora', 'Grupos', 'Actividades', 'Avisos', 'Perfil']);
+        ->assertSeeInOrder(['Bitácora', 'Grupos', 'Actividades', 'Avisos', 'Mensajes']);
 });
 
 test('el inicio de la docente lleva a Bitácora', function () {

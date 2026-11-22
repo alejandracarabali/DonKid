@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\RenewalController as AdminRenewalController;
 use App\Http\Controllers\Guardian\RenewalController as GuardianRenewalController;
+use App\Http\Controllers\Guardian\MessageController as GuardianMessageController;
+use App\Http\Controllers\Educator\MessageController as EducatorMessageController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -115,6 +117,11 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->prefix('docente')
         ->name('educator.')
         ->group(function () {
+            // RF-27: bandeja de mensajes de las familias.
+            Route::get('/mensajes', [EducatorMessageController::class, 'index'])->name('messages.index');
+            Route::get('/mensajes/{conversation}', [EducatorMessageController::class, 'show'])->name('messages.show');
+            Route::post('/mensajes/{conversation}', [EducatorMessageController::class, 'store'])->name('messages.store');
+
             // La docente no tiene "Inicio": su pantalla principal es Bitácora.
             // El director de grupo empieza en la Bitácora; el docente solo por materia, en Grupos.
             Route::get('/', fn () => redirect()->route(
@@ -153,6 +160,11 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
+            // RF-27: mensajes al director de grupo.
+            Route::get('/mensajes', [GuardianMessageController::class, 'index'])->name('messages.index');
+            Route::get('/mensajes/{child}', [GuardianMessageController::class, 'show'])->name('messages.show');
+            Route::post('/mensajes/{child}', [GuardianMessageController::class, 'store'])
+                ->middleware('throttle:10,1')->name('messages.store');
             Route::post('/ninos/{child}/renovar', [GuardianRenewalController::class, 'store'])->name('renewals.store');
             Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
             Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
