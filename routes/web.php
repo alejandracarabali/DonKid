@@ -57,19 +57,19 @@ Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(functi
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
-            Route::resource('educadoras', EducatorController::class)
-            ->parameters(['educadoras' => 'educator'])
+            Route::resource('docentes', EducatorController::class)
+            ->parameters(['docentes' => 'educator'])
             ->except(['show'])
             ->names('educators');
         });
 
     // Zona de educadoras (la coordinación también puede entrar)
     Route::middleware('role:educator,admin')
-        ->prefix('educadora')
+        ->prefix('docente')
         ->name('educator.')
         ->group(function () {
             // La docente no tiene "Inicio": su pantalla principal es Bitácora.
-            Route::redirect('/', '/educadora/bitacora')->name('dashboard');
+            Route::redirect('/', '/docente/bitacora')->name('dashboard');
 
             // Bitácora
             Route::get('/bitacora', [DailyReportController::class, 'index'])->name('reports.index');

@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Nueva educadora</h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Nuevo docente</h2>
     </x-slot>
 
     <div class="py-12">

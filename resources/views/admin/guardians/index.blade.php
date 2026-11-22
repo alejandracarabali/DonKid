@@ -3,8 +3,8 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Familias</h2>
             <a href="{{ route('admin.guardians.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm">
-                Nueva familia
+               class="btn btn-sm">
+                + Nueva familia
             </a>
         </div>
     </x-slot>

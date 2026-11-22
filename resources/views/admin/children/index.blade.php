@@ -5,8 +5,8 @@
             <div class="flex items-center gap-4">
                 <a href="{{ route('admin.children.withdrawn') }}" class="text-sm underline">Ver retirados</a>
                 <a href="{{ route('admin.children.create') }}"
-                   class="inline-flex items-center px-4 py-2 bg-gray-800 text-white rounded-md text-sm">
-                    Nuevo niño
+                   class="btn btn-sm">
+                    + Nuevo niño
                 </a>
             </div>
         </div>
