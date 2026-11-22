@@ -42,6 +42,11 @@ class Navigation
                     ? self::item('Bitácora', 'educator.reports.index', 'educator.reports.*')
                     : null,
                 self::item('Grupos', 'educator.groups.index', 'educator.groups.*'),
+                // RF-07: en primaria, Notas va en la barra. En preescolar la barra ya está llena:
+                // los informes de dimensiones se abren desde Grupos.
+                self::offersDailyLog($user)
+                    ? null
+                    : self::item('Notas', 'educator.grades.index', 'educator.grades.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
                 self::item('Avisos', 'educator.announcements.create', 'educator.announcements.*'),
                 // RF-27: Mensajes reemplaza a Perfil en la barra (Perfil sigue arriba, en el encabezado).

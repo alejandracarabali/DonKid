@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Educator\GroupController;
+use App\Http\Controllers\Educator\GradeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Educator\AnnouncementController;
 use App\Http\Controllers\Guardian\AnnouncementController as GuardianAnnouncementController;
@@ -167,6 +168,14 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/grupos', [GroupController::class, 'index'])->name('groups.index');
             Route::get('/grupos/{classroom}/asistencia', [GroupController::class, 'attendance'])->name('groups.attendance');
             Route::post('/grupos/{classroom}/asistencia', [GroupController::class, 'storeAttendance'])->name('groups.attendance.store');
+
+            // RF-07 y RF-08: notas (primaria) e informes de dimensiones (preescolar).
+            Route::get('/notas', [GradeController::class, 'index'])->name('grades.index');
+            Route::get('/notas/{classroom}/{subject}', [GradeController::class, 'show'])->name('grades.show');
+            Route::post('/notas/{classroom}/{subject}/actividades', [GradeController::class, 'storeAssessment'])->name('grades.assessments.store');
+            Route::delete('/notas/{classroom}/{subject}/actividades/{assessment}', [GradeController::class, 'destroyAssessment'])->name('grades.assessments.destroy');
+            Route::put('/notas/{classroom}/{subject}/planilla', [GradeController::class, 'saveScores'])->name('grades.scores');
+            Route::put('/notas/{classroom}/{subject}/informes', [GradeController::class, 'saveReports'])->name('grades.reports');
 
             // Avisos
             Route::get('/avisos/crear', [AnnouncementController::class, 'create'])->name('announcements.create');
