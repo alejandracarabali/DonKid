@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\GradeLevel;
 use App\Http\Requests\Concerns\SchoolRules;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class ClassroomRequest extends FormRequest
 {
@@ -24,7 +26,16 @@ class ClassroomRequest extends FormRequest
                 $this->uniqueInSchool('classrooms', 'name')->ignore($this->route('classroom')),
             ],
             'age_range' => ['nullable', 'string', 'max:40'],
+            // RF-54: el nivel define si el grupo lleva bitácora. Solo se aceptan
+            // los niveles que corresponden al tipo de institución.
+            'level' => ['required', Rule::enum(GradeLevel::class)->only($this->allowedLevels())],
         ];
+    }
+
+    /** @return list<GradeLevel> */
+    public function allowedLevels(): array
+    {
+        return GradeLevel::forSchool($this->user()?->school?->type);
     }
 
     // UX Writing: errores humanos y accionables.
@@ -34,6 +45,8 @@ class ClassroomRequest extends FormRequest
             'name.required' => 'Escribe el nombre del grupo.',
             'name.unique' => 'Ya existe un grupo con ese nombre en tu colegio.',
             'name.max' => 'El nombre es muy largo. Máximo 60 letras.',
+            'level.required' => 'Elige el nivel del grupo.',
+            'level.enum' => 'Ese nivel no existe en tu institución. Elige otro.',
         ];
     }
 }

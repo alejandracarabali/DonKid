@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\GradeLevel;
+use App\Enums\SchoolType;
 use App\Models\Concerns\BelongsToSchool;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +18,27 @@ class Classroom extends Model
 {
     use HasFactory, BelongsToSchool;
 
-    protected $fillable = ['name', 'age_range'];
+    protected $fillable = ['name', 'age_range', 'level'];
+
+    protected function casts(): array
+    {
+        return ['level' => GradeLevel::class];
+    }
+
+    /**
+     * RF-54: ¿este grupo lleva bitácora diaria?
+     * - Jardín: todos sus grupos.
+     * - Primaria: ninguno.
+     * - Jardín y primaria: solo los grupos de preescolar (un grupo sin nivel, no).
+     */
+    public function hasDailyLog(): bool
+    {
+        return match ($this->school?->type) {
+            SchoolType::Kindergarten => true,
+            SchoolType::Primary => false,
+            default => $this->level?->isPreschool() ?? false,
+        };
+    }
 
     // Un grupo tiene muchos niños.
     // Uso: $classroom->children

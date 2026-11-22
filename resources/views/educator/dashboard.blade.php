@@ -14,10 +14,12 @@
             <p class="text-gray-600">Aún no hay novedades. Te avisamos cuando haya.</p>
 
             <div class="flex flex-wrap gap-3">
-                <a href="{{ route('educator.reports.index') }}"
-                   class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
-                    Bitácora
-                </a>
+                @if (\App\Support\Navigation::offersDailyLog(auth()->user()))
+                    <a href="{{ route('educator.reports.index') }}"
+                       class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
+                        Bitácora
+                    </a>
+                @endif
                 <a href="{{ route('educator.announcements.create') }}"
                    class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
                     Nuevo aviso

@@ -51,7 +51,7 @@
                 </p>
             @endforelse
 
-            @if ($classrooms->isNotEmpty())
+            @if ($classrooms->isNotEmpty() && \App\Support\Navigation::offersDailyLog(auth()->user()))
                 <a href="{{ route('educator.reports.index') }}" class="mt-4 inline-block text-sm font-semibold underline">
                     Ver detalle por estudiante
                 </a>

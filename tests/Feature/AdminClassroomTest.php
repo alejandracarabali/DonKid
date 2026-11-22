@@ -8,7 +8,7 @@ it('permite a coordinación crear un grupo', function () {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
-        ->post(route('admin.classrooms.store'), ['name' => 'Mariposas'])
+        ->post(route('admin.classrooms.store'), ['name' => 'Mariposas', 'level' => 'jardin'])
         ->assertRedirect(route('admin.classrooms.index'));
 
     expect(Classroom::where('name', 'Mariposas')->exists())->toBeTrue();
@@ -19,7 +19,7 @@ it('rechaza un nombre de grupo repetido', function () {
     Classroom::factory()->create(['name' => 'Mariposas']);
 
     $this->actingAs($admin)
-        ->post(route('admin.classrooms.store'), ['name' => 'Mariposas'])
+        ->post(route('admin.classrooms.store'), ['name' => 'Mariposas', 'level' => 'jardin'])
         ->assertSessionHasErrors('name');
 });
 
@@ -45,6 +45,6 @@ it('impide que una familia gestione grupos', function () {
         ->assertForbidden();
 
     $this->actingAs($madre)
-        ->post(route('admin.classrooms.store'), ['name' => 'Intruso'])
+        ->post(route('admin.classrooms.store'), ['name' => 'Intruso', 'level' => 'jardin'])
         ->assertForbidden();
 });

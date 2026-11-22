@@ -27,6 +27,11 @@ class DailyReportPolicy
     // ¿Puede este usuario registrar un reporte para ESTE niño?
     public function create(User $user, Child $child): bool
     {
+        // RF-54: sin bitácora en primaria, ni siquiera para coordinación.
+        if (! $child->hasDailyLog()) {
+            return false;
+        }
+
         return match ($user->role) {
             Role::Admin => true,
             Role::Educator => $user->can('view', $child),

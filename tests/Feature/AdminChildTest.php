@@ -3,7 +3,6 @@
 use App\Models\Child;
 use App\Models\Classroom;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 
 // 1. Camino feliz: coordinación crea un niño con grupo.
 it('permite a coordinación crear un niño', function () {
@@ -58,19 +57,7 @@ it('rechaza un grupo que no existe', function () {
         ->assertSessionHasErrors('classroom_id');
 });
 
-// 5. Al quitar un niño se borran también sus vínculos con acudientes.
-it('borra los vínculos con acudientes al quitar un niño', function () {
-    $admin = User::factory()->admin()->create();
-    $madre = User::factory()->guardian()->create();
-    $nino = Child::factory()->create(['classroom_id' => null]);
-    $nino->guardians()->attach($madre->id, ['relationship' => 'Mamá']);
-
-    $this->actingAs($admin)->delete(route('admin.children.destroy', $nino));
-
-    expect(Child::find($nino->id))->toBeNull()
-        ->and(User::find($madre->id))->not->toBeNull() // la madre sigue existiendo
-        ->and(DB::table('child_guardian')->count())->toBe(0);
-});
+// 5. El retiro (RF-53) se prueba en ChildWithdrawalTest.php: ya no hay borrado.
 
 // 6. Privacidad: una familia no gestiona niños.
 it('impide que una familia gestione niños', function () {

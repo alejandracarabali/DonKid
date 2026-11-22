@@ -27,12 +27,13 @@ class DailyReport extends Model
     /**
      * Un reporte no tiene school_id: pertenece al colegio de su niño.
      * whereHas('child') aplica el filtro de colegio que ya tiene Child.
+     * Sin el scope 'active': los reportes de un niño retirado son su historial (RF-53).
      */
     protected static function booted(): void
     {
         static::addGlobalScope('school', function (Builder $query) {
             if (auth()->guard()->hasUser()) {
-                $query->whereHas('child');
+                $query->whereHas('child', fn (Builder $child) => $child->withoutGlobalScope('active'));
             }
         });
     }
@@ -49,7 +50,8 @@ class DailyReport extends Model
 
     public function child(): BelongsTo
     {
-        return $this->belongsTo(Child::class);
+        // El reporte sigue ligado a su niño aunque este se retire.
+        return $this->belongsTo(Child::class)->withoutGlobalScope('active');
     }
 
     public function educator(): BelongsTo
