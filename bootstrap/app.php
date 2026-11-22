@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
         'role' => \App\Http\Middleware\EnsureRole::class,
         'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
+        'guardian.active' => \App\Http\Middleware\EnsureGuardianIsActive::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -20,7 +20,7 @@ test('dos colegios pueden tener un grupo con el mismo nombre', function () {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
-        ->post(route('admin.classrooms.store'), ['name' => 'Transición'])
+        ->post(route('admin.classrooms.store'), ['name' => 'Transición', 'level' => 'transicion'])
         ->assertSessionHasNoErrors();
 
     expect(Classroom::withoutGlobalScopes()->where('name', 'Transición')->count())->toBe(2);

@@ -11,8 +11,10 @@
         </div>
     </div>
 
-    <a href="{{ route('guardian.reports.index', $child) }}"
-        class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
-        Ver la bitácora
-    </a>
+    @if ($child->hasDailyLog())
+        <a href="{{ route('guardian.reports.index', $child) }}"
+            class="inline-block bg-indigo-600 text-white px-4 py-3 rounded">
+            Ver la bitácora
+        </a>
+    @endif
 </x-app-layout>

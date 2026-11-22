@@ -24,7 +24,8 @@ class SchoolFactory extends Factory
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'type' => fake()->randomElement(SchoolType::cases()),
+            // Fijo (no aleatorio): el tipo cambia qué módulos hay, y un test no debe depender del azar.
+            'type' => SchoolType::Both,
         ];
     }
 
@@ -33,6 +34,11 @@ class SchoolFactory extends Factory
      * Si no existe ninguno, crea uno. Lo usan las demás factories para
      * que, por defecto, todos los datos de prueba queden en el mismo colegio.
      */
+    public function type(SchoolType $type): static
+    {
+        return $this->state(['type' => $type]);
+    }
+
     public static function defaultId(): int
     {
         return School::query()->orderBy('id')->value('id')

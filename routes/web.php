@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/cambiar-clave', [ForcePasswordController::class, 'update'])->name('password.force.update');
 });
 
-Route::middleware(['auth', 'password.changed'])->group(function () {
+Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(function () {
 
     // Punto de entrada único: manda a cada rol a su zona.
     Route::get('/dashboard', function () {
@@ -44,9 +44,14 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
             ->parameters(['grupos' => 'classroom'])
             ->except(['show'])
             ->names('classrooms');
+            // RF-53: no hay "destroy"; un niño retirado se inhabilita, nunca se borra.
+            Route::get('ninos/retirados', [AdminChildController::class, 'withdrawn'])->name('children.withdrawn');
+            Route::patch('ninos/retirados/{child}/reactivar', [AdminChildController::class, 'reactivate'])
+                ->whereNumber('child')->name('children.reactivate');
+            Route::patch('ninos/{child}/retirar', [AdminChildController::class, 'withdraw'])->name('children.withdraw');
             Route::resource('ninos', AdminChildController::class)
             ->parameters(['ninos' => 'child'])
-            ->except(['show'])
+            ->except(['show', 'destroy'])
             ->names('children');
             Route::resource('familias', GuardianController::class)
             ->parameters(['familias' => 'guardian'])

@@ -16,6 +16,9 @@ class DailyReportController extends Controller
         // Evita IDOR: si no es su hijo, 403.
         Gate::authorize('view', $child);
 
+        // RF-54: un niño de primaria no tiene bitácora.
+        abort_unless($child->hasDailyLog(), 404);
+
         $reports = $child->dailyReports()
             ->whereNotNull('published_at')
             ->with('educator')

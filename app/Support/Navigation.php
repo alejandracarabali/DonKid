@@ -26,13 +26,16 @@ class Navigation
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
                 self::item('Nuevo aviso', 'educator.announcements.create', 'educator.announcements.*'),
             ],
-            Role::Educator => [
-                self::item('Bitácora', 'educator.reports.index', 'educator.reports.*'),
+            Role::Educator => array_values(array_filter([
+                // RF-54: sin bitácora en un colegio solo de primaria.
+                self::offersDailyLog($user)
+                    ? self::item('Bitácora', 'educator.reports.index', 'educator.reports.*')
+                    : null,
                 self::item('Grupos', 'educator.groups.index', 'educator.groups.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
                 self::item('Avisos', 'educator.announcements.create', 'educator.announcements.*'),
                 self::item('Perfil', 'profile.edit', 'profile.*'),
-            ],
+            ])),
             Role::Guardian => [
                 self::item('Inicio', 'guardian.dashboard', 'guardian.dashboard'),
                 self::item('Avisos', 'guardian.announcements.index', 'guardian.announcements.*',
@@ -40,6 +43,11 @@ class Navigation
                 self::item('Actividades', 'guardian.activities.index', 'guardian.activities.*'),
             ],
         };
+    }
+
+    public static function offersDailyLog(User $user): bool
+    {
+        return $user->school?->offersDailyLog() ?? true;
     }
 
     /**
