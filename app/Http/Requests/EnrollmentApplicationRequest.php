@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Enums\DocumentType;
+use App\Enums\EnrollmentDocumentType;
 use App\Enums\GradeLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -36,7 +37,18 @@ class EnrollmentApplicationRequest extends FormRequest
             'guardian_email' => ['required', 'email', 'max:120'],
             'guardian_phone' => ['required', 'string', 'max:20', 'regex:/^[0-9 +()-]{7,20}$/'],
             'guardian_address' => ['required', 'string', 'max:200'],
-        ];
+        ] + $this->documentRules();
+    }
+
+    // Los 4 documentos son obligatorios. Máximo 4 MB cada uno.
+    private function documentRules(): array
+    {
+        $rules = [];
+        foreach (EnrollmentDocumentType::cases() as $type) {
+            $rules["documents.{$type->value}"] = ['required', 'file', 'mimes:'.implode(',', $type->mimes()), 'max:4096'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
@@ -60,6 +72,21 @@ class EnrollmentApplicationRequest extends FormRequest
             'guardian_phone.required' => 'Escribe un teléfono de contacto.',
             'guardian_phone.regex' => 'Revisa el teléfono: solo números, mínimo 7.',
             'guardian_address.required' => 'Escribe tu dirección.',
-        ];
+        ] + $this->documentMessages();
+    }
+
+    private function documentMessages(): array
+    {
+        $messages = [];
+        foreach (EnrollmentDocumentType::cases() as $type) {
+            $key = "documents.{$type->value}";
+            $formats = strtoupper(implode(', ', array_diff($type->mimes(), ['jpeg'])));
+            $messages["{$key}.required"] = "Adjunta: {$type->label()}.";
+            $messages["{$key}.uploaded"] = "No se pudo subir: {$type->label()}. Prueba con un archivo más liviano.";
+            $messages["{$key}.mimes"] = "{$type->label()}: sube un archivo {$formats}.";
+            $messages["{$key}.max"] = "{$type->label()}: el archivo pesa más de 4 MB.";
+        }
+
+        return $messages;
     }
 }

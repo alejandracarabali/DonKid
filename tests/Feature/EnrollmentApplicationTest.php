@@ -6,25 +6,11 @@ use App\Models\EnrollmentApplication;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
+beforeEach(fn () => Storage::fake('local'));
 
 // RF-34: formulario público de inscripción.
-
-function enrollmentData(array $overrides = []): array
-{
-    return array_merge([
-        'child_first_name' => 'Sofía',
-        'child_last_name' => 'Gómez',
-        'child_birth_date' => now()->subYears(3)->toDateString(),
-        'desired_level' => 'jardin',
-        'guardian_name' => 'Marta Gómez',
-        'guardian_document_type' => 'cc',
-        'guardian_document_number' => '1020304050',
-        'guardian_relationship' => 'Madre',
-        'guardian_email' => 'marta@correo.co',
-        'guardian_phone' => '300 123 4567',
-        'guardian_address' => 'Calle 10 # 20-30, Cali',
-    ], $overrides);
-}
 
 function demoSchool(): School
 {
