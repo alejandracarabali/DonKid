@@ -19,9 +19,13 @@
                 </div>
             </div>
 
+            {{-- Nadie borra su propia cuenta: las cuentas las administra coordinación. --}}
             <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
                 <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
+                    <h2 class="text-lg font-medium text-gray-900">Tus datos</h2>
+                    <p class="mt-1 text-sm text-gray-600">
+                        Si quieres que eliminemos tu cuenta o tus datos, escríbele a coordinación.
+                    </p>
                 </div>
             </div>
         </div>
