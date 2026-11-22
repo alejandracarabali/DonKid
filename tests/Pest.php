@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
@@ -47,4 +48,41 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+/*
+|--------------------------------------------------------------------------
+| Datos de inscripción (RF-34)
+|--------------------------------------------------------------------------
+| Compartidos por EnrollmentApplicationTest y EnrollmentDocumentsTest.
+*/
+
+function enrollmentData(array $overrides = []): array
+{
+    return array_merge([
+        'child_first_name' => 'Sofía',
+        'child_last_name' => 'Gómez',
+        'child_birth_date' => now()->subYears(3)->toDateString(),
+        'desired_level' => 'jardin',
+        'guardian_name' => 'Marta Gómez',
+        'guardian_document_type' => 'cc',
+        'guardian_document_number' => '1020304050',
+        'guardian_relationship' => 'Madre',
+        'guardian_email' => 'marta@correo.co',
+        'guardian_phone' => '300 123 4567',
+        'guardian_address' => 'Calle 10 # 20-30, Cali',
+        'consent_data' => '1',
+        'consent_health' => '1',
+        'documents' => enrollmentFiles(),
+    ], $overrides);
+}
+
+function enrollmentFiles(): array
+{
+    return [
+        'birth_certificate' => UploadedFile::fake()->create('registro.pdf', 300, 'application/pdf'),
+        'vaccination_card' => UploadedFile::fake()->image('vacunas.jpg'),
+        'eps_certificate' => UploadedFile::fake()->create('eps.pdf', 120, 'application/pdf'),
+        'photo' => UploadedFile::fake()->image('foto.png', 400, 400),
+    ];
 }
