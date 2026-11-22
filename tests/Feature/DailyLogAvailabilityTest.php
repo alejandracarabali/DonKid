@@ -104,3 +104,36 @@ it('exige el nivel al crear un grupo', function () {
         ->post(route('admin.classrooms.store'), ['name' => 'Sin nivel'])
         ->assertSessionHasErrors('level');
 });
+
+it('avisa a la docente cuando su grupo no tiene nivel, en vez de decir que no tiene estudiantes', function () {
+    $school = schoolOfType(SchoolType::Both);
+    $grupo = Classroom::factory()->create(['school_id' => $school->id, 'name' => 'Caminadores', 'level' => null]);
+    $educator = educatorIn($grupo);
+    Child::factory()->create(['classroom_id' => $grupo->id]);
+
+    $this->actingAs($educator)->get(route('educator.reports.index'))
+        ->assertOk()
+        ->assertSee('El grupo Caminadores no tiene nivel asignado')
+        ->assertSee('cuando coordinación le asigne el nivel')
+        ->assertDontSee('Aún no tienes estudiantes asignados');
+});
+
+it('a coordinación le indica dónde asignar el nivel', function () {
+    $school = schoolOfType(SchoolType::Both);
+    Classroom::factory()->create(['school_id' => $school->id, 'name' => 'Caminadores', 'level' => null]);
+    $admin = User::factory()->admin()->create(['school_id' => $school->id]);
+
+    $this->actingAs($admin)->get(route('educator.reports.index'))
+        ->assertOk()
+        ->assertSee('no tiene nivel asignado')
+        ->assertSee(route('admin.classrooms.index'), false);
+});
+
+it('sin grupos sigue diciendo que no tiene estudiantes asignados', function () {
+    $educator = User::factory()->educator()->create();
+
+    $this->actingAs($educator)->get(route('educator.reports.index'))
+        ->assertOk()
+        ->assertSee('Aún no tienes estudiantes asignados')
+        ->assertDontSee('no tiene nivel asignado');
+});
