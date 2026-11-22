@@ -20,6 +20,29 @@
                 </div>
             @endif
 
+            {{-- Buscador: GET, para que la búsqueda quede en la URL y se pueda compartir o recargar. --}}
+            <form method="GET" action="{{ route('platform.schools.index') }}" class="flex flex-wrap items-end gap-3" role="search">
+                <div class="grow">
+                    <x-input-label for="q" value="Buscar colegio" />
+                    <x-text-input id="q" name="q" type="search" class="mt-1 block w-full" :value="$search"
+                                  placeholder="Nombre o dirección (slug)" />
+                </div>
+                <div>
+                    <x-input-label for="estado" value="Estado" />
+                    <select id="estado" name="estado" class="block mt-1 min-h-[48px] rounded-xl border-2 border-line bg-white px-3">
+                        @foreach (['todos' => 'Todos', 'activos' => 'Activos', 'suspendidos' => 'Suspendidos'] as $value => $label)
+                            <option value="{{ $value }}" @selected($status === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <button class="btn btn-sm">Buscar</button>
+                @if ($search !== '' || $status !== 'todos')
+                    <a href="{{ route('platform.schools.index') }}" class="text-sm underline">Limpiar</a>
+                @endif
+            </form>
+
+            <p class="text-sm text-soft" aria-live="polite">{{ $schools->total() }} {{ $schools->total() === 1 ? 'colegio' : 'colegios' }}</p>
+
             <div class="overflow-x-auto">
                 <table class="w-full rounded-lg bg-white text-left shadow-sm">
                     <thead class="bg-navy text-white">
@@ -65,11 +88,15 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="p-6 text-center text-soft">Aún no hay colegios.</td></tr>
+                            <tr><td colspan="6" class="p-6 text-center text-soft">
+                                {{ $search !== '' || $status !== 'todos' ? 'No hay colegios que coincidan con la búsqueda.' : 'Aún no hay colegios.' }}
+                            </td></tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            {{ $schools->links() }}
         </div>
     </div>
 </x-app-layout>

@@ -9,6 +9,7 @@ use App\Http\Requests\PlatformSchoolRequest;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -19,15 +20,25 @@ use Illuminate\View\View;
  */
 class SchoolController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $search = trim((string) $request->query('q', ''));
+        $status = $request->query('estado', 'todos');
+
         $schools = School::query()
+            // Buscar por nombre o por slug (la dirección del enlace de inscripción).
+            ->when($search !== '', fn ($q) => $q->where(fn ($q) => $q
+                ->where('name', 'like', '%'.$search.'%')
+                ->orWhere('slug', 'like', '%'.$search.'%')))
+            ->when($status === 'activos', fn ($q) => $q->whereNull('suspended_at'))
+            ->when($status === 'suspendidos', fn ($q) => $q->whereNotNull('suspended_at'))
             // El conteo ignora los filtros de colegio y de activos, y luego cuenta solo los activos.
             ->withCount(['children as active_children_count' => fn ($q) => $q->withoutGlobalScopes()->whereNull('withdrawn_at')])
             ->orderBy('name')
-            ->get();
+            ->paginate(20)
+            ->withQueryString(); // conserva la búsqueda al cambiar de página
 
-        return view('platform.schools.index', compact('schools'));
+        return view('platform.schools.index', compact('schools', 'search', 'status'));
     }
 
     public function create(): View
