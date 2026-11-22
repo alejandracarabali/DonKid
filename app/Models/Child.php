@@ -93,6 +93,12 @@ class Child extends Model
         return $this->hasOne(ChildHealthRecord::class);
     }
 
+    // RF-36: renovaciones de matrícula, una por año.
+    public function renewals(): HasMany
+    {
+        return $this->hasMany(EnrollmentRenewal::class);
+    }
+
     public function dailyReports(): HasMany
     {
         return $this->hasMany(DailyReport::class);

@@ -8,6 +8,8 @@ use App\Http\Controllers\Guardian\DailyReportController as GuardianReportControl
 use App\Http\Controllers\Educator\DailyReportController;
 use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\Admin\EnrollmentController;
+use App\Http\Controllers\Admin\RenewalController as AdminRenewalController;
+use App\Http\Controllers\Guardian\RenewalController as GuardianRenewalController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -67,6 +69,11 @@ Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(functi
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            // RF-36: renovación de matrícula.
+            Route::get('renovaciones', [AdminRenewalController::class, 'index'])->name('renewals.index');
+            Route::post('renovaciones/abrir', [AdminRenewalController::class, 'open'])->name('renewals.open');
+            Route::post('renovaciones/cerrar', [AdminRenewalController::class, 'close'])->name('renewals.close');
+
             // RF-35: bandeja de inscripciones.
             Route::get('inscripciones', [EnrollmentController::class, 'index'])->name('enrollments.index');
             Route::get('inscripciones/{application}', [EnrollmentController::class, 'show'])->name('enrollments.show');
@@ -118,6 +125,8 @@ Route::middleware(['auth', 'password.changed', 'guardian.active'])->group(functi
             Route::get('/', \App\Http\Controllers\Guardian\DashboardController::class)->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
+            Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
+            Route::post('/ninos/{child}/renovar', [GuardianRenewalController::class, 'store'])->name('renewals.store');
             Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
             Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
             Route::get('/actividades', [\App\Http\Controllers\Guardian\ActivityController::class, 'index'])->name('activities.index');
