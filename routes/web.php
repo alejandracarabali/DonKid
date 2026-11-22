@@ -26,6 +26,7 @@ Route::get('/inscripcion/{school:slug}', [EnrollmentApplicationController::class
 Route::post('/inscripcion/{school:slug}', [EnrollmentApplicationController::class, 'store'])
     ->middleware('throttle:5,60')->name('enrollment.store');
 Route::get('/inscripcion/{school:slug}/enviada', [EnrollmentApplicationController::class, 'sent'])->name('enrollment.sent');
+Route::get('/politica-de-datos/{school:slug}', [EnrollmentApplicationController::class, 'policy'])->name('enrollment.policy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/cambiar-clave', [ForcePasswordController::class, 'edit'])->name('password.force');
