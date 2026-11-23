@@ -11,16 +11,28 @@ use Illuminate\Support\Facades\Storage;
 
 beforeEach(function () {
     Storage::fake('local'); // disco de mentira: las pruebas no ensucian storage/
-    $this->classroom = Classroom::factory()->create();
-    $this->educator = User::factory()->educator()->create();
-    $this->educator->classrooms()->attach($this->classroom);
 });
 
+/**
+ * Un grupo con su docente. Se devuelven en variables normales (no en $this)
+ * para que el editor sepa qué tipo tiene cada una.
+ *
+ * @return array{0: Classroom, 1: User}
+ */
+function planningSetup(): array
+{
+    $classroom = Classroom::factory()->create();
+    $educator = User::factory()->educator()->create();
+    $educator->classrooms()->attach($classroom);
+
+    return [$classroom, $educator];
+}
+
 // Datos válidos de una actividad, con lo que se quiera cambiar.
-function activityData(array $overrides = []): array
+function activityData(Classroom $classroom, array $overrides = []): array
 {
     return array_merge([
-        'classroom_id' => test()->classroom->id,
+        'classroom_id' => $classroom->id,
         'title' => 'Semana de los animales',
         'starts_at' => now()->addDay()->format('Y-m-d\TH:i'),
         'ends_at' => now()->addDay()->addHour()->format('Y-m-d\TH:i'),
@@ -33,8 +45,10 @@ function pdf(string $name = 'Semana 12.pdf'): UploadedFile
 }
 
 it('guarda el PDF en el disco privado con nombre aleatorio', function () {
-    $this->actingAs($this->educator)
-        ->post(route('educator.activities.store'), activityData(['attachment' => pdf()]))
+    [$classroom, $educator] = planningSetup();
+
+    $this->actingAs($educator)
+        ->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]))
         ->assertSessionHasNoErrors();
 
     $activity = Activity::sole();
@@ -45,14 +59,18 @@ it('guarda el PDF en el disco privado con nombre aleatorio', function () {
 });
 
 it('la actividad sin PDF se sigue creando normal', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData())->assertSessionHasNoErrors();
+    [$classroom, $educator] = planningSetup();
+
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom))->assertSessionHasNoErrors();
 
     expect(Activity::sole()->attachment_path)->toBeNull();
 });
 
 it('rechaza archivos que no son PDF o pesan más de 10 MB', function (UploadedFile $file, string $message) {
-    $this->actingAs($this->educator)
-        ->post(route('educator.activities.store'), activityData(['attachment' => $file]))
+    [$classroom, $educator] = planningSetup();
+
+    $this->actingAs($educator)
+        ->post(route('educator.activities.store'), activityData($classroom, ['attachment' => $file]))
         ->assertSessionHasErrors(['attachment' => $message]);
 
     expect(Activity::count())->toBe(0);
@@ -62,11 +80,12 @@ it('rechaza archivos que no son PDF o pesan más de 10 MB', function (UploadedFi
 ]);
 
 it('al subir otro PDF borra el anterior', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf('vieja.pdf')]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf('vieja.pdf')]));
     $activity = Activity::sole();
     $old = $activity->attachment_path;
 
-    $this->put(route('educator.activities.update', $activity), activityData(['attachment' => pdf('nueva.pdf')]))
+    $this->put(route('educator.activities.update', $activity), activityData($classroom, ['attachment' => pdf('nueva.pdf')]))
         ->assertSessionHasNoErrors();
 
     $activity->refresh();
@@ -76,28 +95,31 @@ it('al subir otro PDF borra el anterior', function () {
 });
 
 it('editar sin tocar el PDF lo conserva', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf()]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]));
     $activity = Activity::sole();
 
-    $this->put(route('educator.activities.update', $activity), activityData(['title' => 'Otro título']));
+    $this->put(route('educator.activities.update', $activity), activityData($classroom, ['title' => 'Otro título']));
 
     expect($activity->fresh()->attachment_path)->toBe($activity->attachment_path);
     Storage::disk('local')->assertExists($activity->attachment_path);
 });
 
 it('se puede quitar el PDF', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf()]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]));
     $activity = Activity::sole();
     $path = $activity->attachment_path;
 
-    $this->put(route('educator.activities.update', $activity), activityData(['remove_attachment' => '1']));
+    $this->put(route('educator.activities.update', $activity), activityData($classroom, ['remove_attachment' => '1']));
 
     expect($activity->fresh()->attachment_path)->toBeNull();
     Storage::disk('local')->assertMissing($path);
 });
 
 it('al eliminar la actividad se borra su PDF', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf()]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]));
     $activity = Activity::sole();
 
     $this->delete(route('educator.activities.destroy', $activity));
@@ -106,10 +128,11 @@ it('al eliminar la actividad se borra su PDF', function () {
 });
 
 it('la familia del grupo ve el enlace y descarga el PDF con su nombre original', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf()]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]));
     $activity = Activity::sole();
     $guardian = User::factory()->guardian()->create();
-    $guardian->children()->attach(Child::factory()->create(['classroom_id' => $this->classroom->id]));
+    $guardian->children()->attach(Child::factory()->create(['classroom_id' => $classroom->id]));
 
     $this->actingAs($guardian)
         ->get(route('guardian.activities.index', ['semana' => now()->addDay()->toDateString()]))
@@ -121,7 +144,8 @@ it('la familia del grupo ve el enlace y descarga el PDF con su nombre original',
 });
 
 it('una familia de otro grupo no puede descargarlo', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData(['attachment' => pdf()]));
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom, ['attachment' => pdf()]));
     $guardian = User::factory()->guardian()->create();
     $guardian->children()->attach(Child::factory()->create()); // su hijo está en otro grupo
 
@@ -129,7 +153,8 @@ it('una familia de otro grupo no puede descargarlo', function () {
 });
 
 it('responde 404 si la actividad no tiene PDF', function () {
-    $this->actingAs($this->educator)->post(route('educator.activities.store'), activityData());
+    [$classroom, $educator] = planningSetup();
+    $this->actingAs($educator)->post(route('educator.activities.store'), activityData($classroom));
 
     $this->get(route('activities.attachment', Activity::sole()))->assertNotFound();
 });
