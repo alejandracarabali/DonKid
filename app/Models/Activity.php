@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @mixin IdeHelperActivity
@@ -47,4 +48,20 @@ class Activity extends Model
     {
         return $this->belongsTo(User::class, 'author_id');
     }
+
+    // Registro (RF-32): la docente la marca como hecha, con nota y fotos.
+    public function isDone(): bool
+    {
+        return $this->done_at !== null;
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(ActivityPhoto::class)->orderBy('id');
+    }
+
+    public function doneBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'done_by');
+    }    
 }

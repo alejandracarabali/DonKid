@@ -132,8 +132,10 @@ class ActivityController extends Controller
     {
         Gate::authorize('delete', $activity);
 
-        $activity->delete();
-        $this->deleteFile($activity->attachment_path);        
+        $photoPaths = $activity->photos()->pluck('path')->all();
+        $activity->delete(); // las filas de fotos se borran en cascada
+        $this->deleteFile($activity->attachment_path);
+        Storage::disk('local')->delete($photoPaths);        
 
         return redirect()->route('educator.activities.index')
             ->with('status', 'Actividad eliminada.');
