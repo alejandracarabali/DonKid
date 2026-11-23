@@ -37,6 +37,10 @@
                                 @if ($activity->description)
                                     <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                 @endif
+                                @if ($activity->description)
+                                    <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
+                                @endif
+                                <x-activity-attachment :activity="$activity" />
                             </li>
                         @endforeach
                     </ul>

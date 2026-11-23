@@ -11,6 +11,7 @@
                 </div>
             @else
                 <form method="POST" action="{{ route('educator.activities.store') }}"
+                      enctype="multipart/form-data"
                       class="bg-white p-6 rounded shadow space-y-4">
                     @include('educator.activities._form')
                 </form>

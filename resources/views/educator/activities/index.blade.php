@@ -64,6 +64,10 @@
                                     @if ($activity->description)
                                         <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                     @endif
+                                    @if ($activity->description)
+                                        <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
+                                    @endif
+                                    <x-activity-attachment :activity="$activity" />
                                 </div>
                                 <div class="flex items-center gap-3 text-sm shrink-0">
                                     <a href="{{ route('educator.activities.edit', $activity) }}"
