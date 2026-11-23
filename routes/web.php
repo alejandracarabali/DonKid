@@ -198,6 +198,7 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->group(function () {
             Route::get('/', \App\Http\Controllers\Guardian\DashboardController::class)->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
+            Route::put('/ninos/{child}/autorizacion-imagen', [ChildController::class, 'imageConsent'])->name('children.image-consent');            
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
             // Fase 5: solicitudes (excusa, permiso, recomendación).
