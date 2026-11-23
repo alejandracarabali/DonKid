@@ -3,7 +3,12 @@
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Niños</h2>
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.children.withdrawn') }}" class="text-sm underline">Ver retirados</a>
+                {{-- Acción de página: ícono + texto (no solo ícono). --}}
+                <a href="{{ route('admin.children.withdrawn') }}"
+                   class="inline-flex min-h-[44px] items-center gap-2 rounded-xl border-2 border-line bg-canvas px-4 text-sm font-bold text-navy hover:border-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-action">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v4H3z"/><path d="M5 9v10h14V9"/><path d="M10 13h4"/></svg>
+                    Ver retirados
+                </a>
                 <a href="{{ route('admin.children.create') }}"
                    class="btn btn-sm">
                     + Nuevo niño
@@ -31,9 +36,11 @@
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-4">
-                        {{-- Retirar está dentro de Editar: pide fecha y motivo. --}}
-                        <a href="{{ route('admin.children.edit', $child) }}" class="text-sm underline">Editar o retirar</a>
+                    <div class="flex gap-2">
+                        <x-icon-button icon="edit" label="Editar" :context="$child->first_name.' '.$child->last_name" :href="route('admin.children.edit', $child)" />
+                        {{-- Retirar pide fecha y motivo (RF-53): lleva a esa sección de Editar, no retira de una vez. --}}
+                        <x-icon-button icon="user-minus" variant="danger" label="Retirar" :context="$child->first_name.' '.$child->last_name"
+                                       :href="route('admin.children.edit', $child).'#retirar'" />
                     </div>
                 </div>
             @empty

@@ -19,18 +19,23 @@
 
                     <ul class="mt-3 divide-y divide-line">
                         @foreach ($subjects[$kind->value] ?? [] as $subject)
-                            <li class="flex flex-wrap items-center gap-3 py-2">
-                                <form method="POST" action="{{ route('admin.subjects.update', $subject) }}" class="flex grow items-center gap-2">
+                            {{-- Desactivada: la fila se atenúa y el botón pasa a "Activar". --}}
+                            <li @class(['flex items-center gap-2 py-3', 'opacity-60' => ! $subject->active])>
+                                <form id="save-{{ $subject->id }}" method="POST" action="{{ route('admin.subjects.update', $subject) }}" class="min-w-0 flex-1">
                                     @csrf
                                     @method('PATCH')
-                                    <label for="s{{ $subject->id }}" class="sr-only">Nombre</label>
-                                    <x-text-input id="s{{ $subject->id }}" name="name" type="text" maxlength="80" class="grow" :value="$subject->name"
-                                                  :class="$subject->active ? '' : 'text-soft line-through'" />
-                                    <button class="text-sm underline">Guardar</button>
+                                    <label for="s{{ $subject->id }}" class="sr-only">Nombre de {{ $subject->name }}</label>
+                                    <input id="s{{ $subject->id }}" name="name" type="text" maxlength="80" required
+                                           value="{{ $subject->name }}"
+                                           class="block min-h-[48px] w-full rounded-xl border-2 border-line px-3 text-base focus:border-action focus:ring-action">
                                 </form>
+                                {{-- form="save-…" conecta el botón con el formulario de la izquierda aunque esté fuera de él. --}}
+                                <x-icon-button type="submit" form="save-{{ $subject->id }}" icon="save" variant="soft" label="Guardar cambios" :context="$subject->name" />
+
                                 <form method="POST" action="{{ route('admin.subjects.toggle', $subject) }}">
                                     @csrf
-                                    <button class="text-sm underline {{ $subject->active ? 'text-bad' : '' }}">{{ $subject->active ? 'Desactivar' : 'Activar' }}</button>
+                                    <x-icon-button type="submit" icon="power" :variant="$subject->active ? 'danger' : 'soft'"
+                                                   :label="$subject->active ? 'Desactivar' : 'Activar'" :context="$subject->name" />
                                 </form>
                             </li>
                         @endforeach

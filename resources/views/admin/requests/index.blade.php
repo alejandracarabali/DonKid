@@ -28,19 +28,7 @@
             </form>
 
             @forelse ($requests as $request)
-                <div class="rounded-lg bg-white p-4 shadow-sm">
-                    <p>
-                        <strong>{{ $request->child?->first_name }} {{ $request->child?->last_name }}</strong>
-                        <span class="text-sm text-soft">· {{ $request->child?->classroom?->name ?? 'Sin grupo' }}</span>
-                        <span class="tag">{{ $request->type->label() }}</span>
-                        <span class="tag">{{ $request->status->label() }}</span>
-                    </p>
-                    <p class="mt-1">{{ $request->summary() }}{{ $request->date ? ' · '.$request->date->format('d/m/Y') : '' }}</p>
-                    @if ($request->note)
-                        <p class="text-sm text-soft">{{ $request->note }}</p>
-                    @endif
-                    <p class="text-sm text-soft">De {{ $request->guardian?->name }} · {{ $request->created_at->format('d/m/Y H:i') }}</p>
-                </div>
+                <x-request-card :request="$request" />
             @empty
                 <p class="text-gray-600">No hay solicitudes con esos filtros.</p>
             @endforelse

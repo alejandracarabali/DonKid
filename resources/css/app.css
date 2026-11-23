@@ -77,3 +77,5 @@
         outline-offset: 2px;
     }
 }
+/* Alpine: oculta lo que tiene x-cloak hasta que Alpine arranca (evita parpadeos). */
+[x-cloak] { display: none !important; }
