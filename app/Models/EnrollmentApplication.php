@@ -38,6 +38,7 @@ class EnrollmentApplication extends Model
             'reviewed_at' => 'datetime',
             'data_consent_at' => 'datetime',
             'health_consent_at' => 'datetime',
+            'image_consent_at' => 'datetime',
         ];
     }
 

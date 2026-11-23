@@ -40,6 +40,7 @@ class EnrollmentApplicationRequest extends FormRequest
 
             // RF-37: autorización general (siempre obligatoria) y de datos de salud.
             'consent_data' => ['accepted'],
+            'consent_image' => ['nullable', 'boolean'],            
             'consent_health' => config('privacy.health_documents_required')
                 ? ['accepted']
                 : ['nullable', 'boolean'],

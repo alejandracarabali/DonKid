@@ -39,7 +39,7 @@ class EnrollmentApplicationController extends Controller
             // Transacción: si algo falla, no queda una solicitud a medias en la base de datos.
             $application = DB::transaction(function () use ($request, $school, &$stored) {
                 $application = new EnrollmentApplication(
-                    $request->safe()->except(['website', 'documents', 'consent_data', 'consent_health'])
+                    $request->safe()->except(['website', 'documents', 'consent_data', 'consent_health', 'consent_image'])
                 );
                 // El colegio sale de la URL, nunca del formulario: así nadie la envía a otro colegio.
                 $application->school_id = $school->id;
@@ -49,6 +49,7 @@ class EnrollmentApplicationController extends Controller
                 $application->forceFill([
                     'data_consent_at' => now(),
                     'health_consent_at' => $request->boolean('consent_health') ? now() : null,
+                    'image_consent_at' => $request->boolean('consent_image') ? now() : null,                    
                     'consent_ip' => $request->ip(),
                     'consent_policy_version' => config('privacy.policy_version'),
                 ]);
