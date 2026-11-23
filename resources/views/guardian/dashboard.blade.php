@@ -11,6 +11,31 @@
                 <div class="bg-green-50 text-green-800 p-3 rounded">{{ session('status') }}</div>
             @endif
 
+            {{-- Autorización de imagen: se pregunta hasta que la familia responda sí o no. --}}
+            @foreach ($children->filter->awaitsImageConsentAnswer() as $child)
+                <section class="card border-amber" aria-labelledby="fotos-{{ $child->id }}">
+                    <h3 id="fotos-{{ $child->id }}" class="text-lg font-semibold">¿Autorizas fotos de {{ $child->first_name }}?</h3>
+                    <p class="mt-1">
+                        El colegio comparte fotos de las actividades solo con las familias del grupo que autorizaron.
+                        Sin tu autorización no se toman ni se comparten fotos de {{ $child->first_name }}. Puedes cambiar tu respuesta cuando quieras.
+                    </p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <form method="POST" action="{{ route('guardian.children.image-consent', $child) }}">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="consent" value="1">
+                            <button class="btn btn-sm">Sí, autorizo</button>
+                        </form>
+                        <form method="POST" action="{{ route('guardian.children.image-consent', $child) }}">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="consent" value="0">
+                            <button class="btn btn-secondary btn-sm">No autorizo</button>
+                        </form>
+                    </div>
+                </section>
+            @endforeach            
+
             <section class="space-y-3">
                 <h3 class="font-semibold text-gray-800">Mis hijos</h3>
 

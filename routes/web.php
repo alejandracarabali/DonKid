@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityRecordController as AdminActivityRecordController;
+use App\Http\Controllers\ActivityPhotoController;
+use App\Http\Controllers\Educator\ActivityRecordController;
 use App\Http\Controllers\ActivityAttachmentController;
 use App\Http\Controllers\Educator\GroupController;
 use App\Http\Controllers\Educator\GradeController;
@@ -124,6 +127,8 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
 
             // Fase 5: todas las solicitudes de las familias.
             Route::get('solicitudes', [AdminRequestController::class, 'index'])->name('requests.index');
+            // RF-32: registro de las actividades hechas, con nota y fotos.
+            Route::get('registro-actividades', [AdminActivityRecordController::class, 'index'])->name('activity-records.index');            
 
             // RF-36: renovación de matrícula.
             Route::get('renovaciones', [AdminRenewalController::class, 'index'])->name('renewals.index');
@@ -189,6 +194,10 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/actividades/{activity}/editar', [\App\Http\Controllers\Educator\ActivityController::class, 'edit'])->name('activities.edit');
             Route::put('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'update'])->name('activities.update');
             Route::delete('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'destroy'])->name('activities.destroy');
+            // RF-32: registro de la actividad hecha (nota y fotos).
+            Route::get('/actividades/{activity}/registro', [ActivityRecordController::class, 'edit'])->name('activities.record');
+            Route::put('/actividades/{activity}/registro', [ActivityRecordController::class, 'update'])->name('activities.record.update');
+            Route::delete('/actividades/{activity}/fotos/{photo}', [ActivityRecordController::class, 'destroyPhoto'])->name('activities.photos.destroy');            
         });
 
     // Zona de familias
@@ -198,6 +207,7 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->group(function () {
             Route::get('/', \App\Http\Controllers\Guardian\DashboardController::class)->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
+            Route::put('/ninos/{child}/autorizacion-imagen', [ChildController::class, 'imageConsent'])->name('children.image-consent');            
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
             // Fase 5: solicitudes (excusa, permiso, recomendación).
@@ -218,7 +228,9 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         });
 
     // Planeación en PDF de una actividad: docente, coordinación y familias del grupo.
-    Route::get('/actividades/{activity}/planeacion', ActivityAttachmentController::class)->name('activities.attachment');        
+    Route::get('/actividades/{activity}/planeacion', ActivityAttachmentController::class)->name('activities.attachment');   
+    // Fotos de una actividad: coordinación, docentes del grupo y familias que autorizaron.
+    Route::get('/actividades/{activity}/fotos/{photo}', ActivityPhotoController::class)->name('activities.photos.show');         
 
     // Perfil: lo comparten todos los roles
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

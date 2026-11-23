@@ -24,6 +24,7 @@ class RenewalRequest extends FormRequest
             'guardian_address' => ['required', 'string', 'max:200'],
 
             // Ficha de salud: solo se guarda si la familia autoriza los datos de salud.
+            'consent_image' => ['nullable', 'boolean'],
             'health.eps' => ['nullable', 'string', 'max:80', 'prohibited_unless:consent_health,1'],
             'health.conditions' => ['nullable', 'string', 'max:500', 'prohibited_unless:consent_health,1'],
             'health.medications' => ['nullable', 'string', 'max:500', 'prohibited_unless:consent_health,1'],

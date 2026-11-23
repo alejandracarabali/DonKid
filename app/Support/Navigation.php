@@ -34,6 +34,7 @@ class Navigation
                 self::item('Familias', 'admin.guardians.index', 'admin.guardians.*'),
                 self::item('Docentes', 'admin.educators.index', 'admin.educators.*'),
                 self::item('Actividades', 'educator.activities.index', 'educator.activities.*'),
+                self::item('Registro', 'admin.activity-records.index', 'admin.activity-records.*'),                
                 self::item('Nuevo aviso', 'educator.announcements.create', 'educator.announcements.*'),
             ],
             Role::Educator => array_values(array_filter([

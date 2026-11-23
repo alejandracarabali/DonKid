@@ -24,10 +24,10 @@ function familyAndDirector(): array
 {
     $grupo = Classroom::factory()->create();
     $director = User::factory()->educator()->create(['name' => 'Sol Parra']);
-    $materia = User::factory()->educator()->create();
+    $materia = User::factory()->educator()->create(['name' => 'Luis Mora']);
     $grupo->educators()->attach([$director->id, $materia->id]);
     $grupo->update(['director_id' => $director->id]);
-    $nino = Child::factory()->create(['classroom_id' => $grupo->id, 'first_name' => 'Ana']);
+    $nino = Child::factory()->create(['classroom_id' => $grupo->id, 'first_name' => 'Zuleima']); // nombre poco común: los nombres al azar no lo contienen
     $madre = User::factory()->guardian()->create(['name' => 'Marta Gómez']);
     $madre->children()->attach($nino);
 
@@ -58,7 +58,7 @@ it('la familia escribe al director dentro del horario y le llega de inmediato', 
         ->assertRedirect(route('guardian.messages.show', $nino));
 
     $this->actingAs($director)->get(route('educator.messages.index'))
-        ->assertOk()->assertSee('Ana')->assertSee('1 nuevo');
+        ->assertOk()->assertSee('Zuleima')->assertSee('1 nuevo');
 
     $this->actingAs($director)->get(route('educator.messages.show', Conversation::first()))
         ->assertOk()->assertSee('Hoy Ana sale a las 11.');
@@ -71,12 +71,12 @@ it('un mensaje de noche no le aparece al director hasta las 6:00 a. m.', functio
     $this->actingAs($madre)->post(route('guardian.messages.store', $nino), ['body' => 'Mañana no va.'])
         ->assertSessionHas('status', fn ($s) => str_contains($s, '6:00 a. m.'));
 
-    $this->actingAs($director)->get(route('educator.messages.index'))->assertDontSee('Ana');
+    $this->actingAs($director)->get(route('educator.messages.index'))->assertDontSee('Zuleima');
     expect(collect(Navigation::for($director))->firstWhere('label', 'Mensajes')['badge'])->toBe(0);
 
     Carbon::setTestNow(bogota('2026-11-24 06:00'));
-    $this->actingAs($director)->get(route('educator.messages.index'))->assertSee('Ana')->assertSee('1 nuevo');
-});
+    $this->actingAs($director)->get(route('educator.messages.index'))->assertSee('Zuleima')->assertSee('1 nuevo');
+    });
 
 it('la familia ve que su mensaje se entregará a las 6:00 a. m.', function () {
     Carbon::setTestNow(bogota('2026-11-23 22:00'));
@@ -164,9 +164,7 @@ it('funciona igual si la app usa la hora de Colombia', function () {
     [$madre, $nino, $director] = familyAndDirector();
 
     $this->actingAs($madre)->post(route('guardian.messages.store', $nino), ['body' => 'Hola']);
-
-    $this->actingAs($director)->get(route('educator.messages.index'))->assertSee('Ana')->assertSee('1 nuevo');
+    $this->actingAs($director)->get(route('educator.messages.index'))->assertSee('Zuleima')->assertSee('1 nuevo');
 
     date_default_timezone_set('UTC');
 });
-

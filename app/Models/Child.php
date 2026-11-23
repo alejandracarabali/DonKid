@@ -28,7 +28,7 @@ class Child extends Model
     // Laravel convierte el texto de la BD en un objeto fecha (Carbon).
     protected function casts(): array
     {
-        return ['birth_date' => 'date', 'withdrawn_at' => 'date'];
+        return ['birth_date' => 'date', 'withdrawn_at' => 'date', 'image_consent_at' => 'datetime', 'image_consent_answered_at' => 'datetime'];
     }
 
     // RF-53: por defecto, toda consulta de niños trae solo a los activos.
@@ -72,6 +72,40 @@ class Child extends Model
         $this->forceFill(['withdrawn_at' => null, 'withdrawal_reason' => null])->save();
     }
 
+    // Autorización de uso de imagen (fotos de actividades). Revocable en cualquier momento.
+    public function hasImageConsent(): bool
+    {
+        return $this->image_consent_at !== null;
+    }
+
+    // ¿La familia aún no ha dicho ni sí ni no? Entonces el Inicio le pregunta.
+    public function awaitsImageConsentAnswer(): bool
+    {
+        return $this->image_consent_answered_at === null;
+    }
+
+    // No son asignables en bloque: solo se cambian con estos dos métodos.
+    public function grantImageConsent(User $guardian, ?string $ip): void
+    {
+        $this->forceFill([
+            'image_consent_at' => now(),
+            'image_consent_by' => $guardian->id,
+            'image_consent_ip' => $ip,
+            'image_consent_answered_at' => now(),
+        ])->save();
+    }
+
+    public function revokeImageConsent(): void
+    {
+        // "No" también es una respuesta: se guarda cuándo, para no volver a preguntar.
+        $this->forceFill([
+            'image_consent_at' => null,
+            'image_consent_by' => null,
+            'image_consent_ip' => null,
+            'image_consent_answered_at' => now(),
+        ])->save();
+    }
+    
     // Un niño pertenece a un grupo.
     // Uso: $child->classroom->name
     public function classroom(): BelongsTo

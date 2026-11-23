@@ -85,6 +85,14 @@
                         <a href="{{ route('enrollment.policy', auth()->user()->school) }}" target="_blank" rel="noopener" class="font-bold text-action underline">política de tratamiento de datos</a>.</span>
                 </label>
                 <x-input-error :messages="$errors->get('consent_data')" />
+
+                {{-- RF-67: viene marcada si ya había autorizado. --}}
+                <label class="flex items-start gap-3">
+                    <input type="checkbox" name="consent_image" value="1" @checked(old('consent_image', $child->hasImageConsent()))
+                           class="mt-1 h-6 w-6 shrink-0 rounded border-2 border-line text-action focus:ring-action">
+                    <span class="text-sm">Autorizo que el colegio tome fotos de mi hijo o hija en las actividades y las comparta solo con las familias de su grupo que también lo autorizaron. Es opcional.</span>
+                </label>                
+                    
                 <label class="flex items-start gap-3">
                     <input type="checkbox" name="consent_health" value="1" @checked(old('consent_health', $health !== null))
                            @required(config('privacy.health_documents_required'))

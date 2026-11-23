@@ -35,6 +35,22 @@ class ActivityPolicy
     }
 
     /**
+     * Fotos (RF-32): coordinación y docentes del grupo, siempre.
+     * Familias: solo si tienen un hijo en ese grupo CON autorización de imagen (RF-67).
+     */
+    public function viewPhotos(User $user, Activity $activity): bool
+    {
+        if ($user->role !== Role::Guardian) {
+            return $this->view($user, $activity);
+        }
+
+        return $user->children()
+            ->where('classroom_id', $activity->classroom_id)
+            ->whereNotNull('image_consent_at')
+            ->exists();
+    }    
+
+    /**
      * Ver: Admin todo; educadora los grupos suyos; familia solo los grupos
      * donde tiene hijos (privacidad por diseño).
      */
