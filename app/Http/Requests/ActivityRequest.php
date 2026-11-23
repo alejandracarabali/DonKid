@@ -23,6 +23,9 @@ class ActivityRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:500'],
             'starts_at' => ['required', 'date'],
             'ends_at' => ['required', 'date', 'after:starts_at'],
+            // Planeación semanal: solo PDF, máximo 10 MB (max se mide en kilobytes).
+            'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:10240'],
+            'remove_attachment' => ['nullable', 'boolean'],            
         ];
     }
 
@@ -34,7 +37,10 @@ class ActivityRequest extends FormRequest
             'title.required' => 'Escribe un título para la actividad.',
             'starts_at.required' => 'Indica cuándo empieza.',
             'ends_at.required' => 'Indica cuándo termina.',
-            'ends_at.after' => 'La hora de fin debe ser posterior a la de inicio.',
+            'ends_at.after' => 'La hora de fin debe ser posterior a la de inicio.',  
+            'attachment.mimes' => 'El archivo debe ser un PDF.',
+            'attachment.max' => 'El PDF pesa más de 10 MB. Prueba con uno más liviano.',
+            'attachment.uploaded' => 'El PDF no se pudo subir. Puede que pese demasiado.',                      
         ];
     }
 }

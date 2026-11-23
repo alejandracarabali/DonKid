@@ -64,4 +64,14 @@ class UserFactory extends Factory
     {
         return $this->state(fn () => ['role' => Role::SuperAdmin, 'school_id' => null]);
     }
+
+    // Con la verificación en dos pasos ya configurada.
+    public function withTwoFactor(?string $secret = null): static
+    {
+        return $this->state(fn () => [
+            'two_factor_secret' => $secret ?? \App\Support\Totp::generateSecret(),
+            'two_factor_recovery_codes' => ['AAAA-BBBB', 'CCCC-DDDD'],
+            'two_factor_confirmed_at' => now(),
+        ]);
+    }
 }

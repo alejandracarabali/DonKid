@@ -59,20 +59,35 @@
                                             {{ $activity->ends_at->format('H:i') }}
                                         @else
                                             {{ $activity->ends_at->translatedFormat('j M, H:i') }}
-                                        @endif                                        · {{ $activity->classroom->name }}
+                                        @endif
+                                        · {{ $activity->classroom->name }}
                                     </p>
                                     @if ($activity->description)
                                         <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                     @endif
+                                    <x-activity-attachment :activity="$activity" />
+                                    @if ($activity->isDone())
+                                        <p class="mt-1"><span class="tag bg-ok-bg text-ok border border-ok">✓ Hecha</span></p>
+                                    @endif
                                 </div>
-                                <div class="flex items-center gap-3 text-sm shrink-0">
-                                    <a href="{{ route('educator.activities.edit', $activity) }}"
-                                       class="text-blue-700 hover:underline">Editar</a>
-                                    <form method="POST" action="{{ route('educator.activities.destroy', $activity) }}"
-                                          onsubmit="return confirm('¿Eliminar esta actividad?')">
+
+                                <div x-data="{ confirming: false }" class="shrink-0">
+                                    <div x-show="! confirming" class="flex gap-2">
+                                        {{-- RF-32: registrar que se hizo, con nota y fotos. --}}
+                                        <x-icon-button icon="check" :variant="$activity->isDone() ? 'soft' : 'primary'"
+                                                       :label="$activity->isDone() ? 'Ver registro' : 'Registrar como hecha'" :context="$activity->title"
+                                                       :href="route('educator.activities.record', $activity)" />
+                                        <x-icon-button icon="edit" label="Editar" :context="$activity->title" :href="route('educator.activities.edit', $activity)" />
+                                        <x-icon-button icon="trash" variant="danger" label="Eliminar" :context="$activity->title" x-on:click="confirming = true" />
+                                    </div>
+                                    {{-- Confirmación en la misma fila (reemplaza el confirm() del navegador). --}}
+                                    <form x-show="confirming" x-cloak method="POST" action="{{ route('educator.activities.destroy', $activity) }}"
+                                          class="flex flex-wrap items-center justify-end gap-2" role="alertdialog" aria-label="Confirmar que eliminas {{ $activity->title }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="text-red-700 hover:underline">Eliminar</button>
+                                        <p class="w-full text-right text-sm font-bold text-bad">¿Eliminar esta actividad?</p>
+                                        <button type="submit" class="min-h-[44px] rounded-xl border-2 border-bad bg-bad px-4 text-sm font-bold text-white">Sí, eliminar</button>
+                                        <button type="button" x-on:click="confirming = false" class="min-h-[44px] rounded-xl border-2 border-navy px-4 text-sm font-bold text-navy">Cancelar</button>
                                     </form>
                                 </div>
                             </li>

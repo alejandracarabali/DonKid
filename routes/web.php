@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityRecordController as AdminActivityRecordController;
+use App\Http\Controllers\ActivityPhotoController;
+use App\Http\Controllers\Educator\ActivityRecordController;
+use App\Http\Controllers\ActivityAttachmentController;
 use App\Http\Controllers\Educator\GroupController;
+use App\Http\Controllers\Educator\GradeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Educator\AnnouncementController;
 use App\Http\Controllers\Guardian\AnnouncementController as GuardianAnnouncementController;
@@ -10,6 +15,15 @@ use App\Http\Controllers\Admin\EducatorController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\RenewalController as AdminRenewalController;
 use App\Http\Controllers\Guardian\RenewalController as GuardianRenewalController;
+use App\Http\Controllers\Guardian\MessageController as GuardianMessageController;
+use App\Http\Controllers\Educator\MessageController as EducatorMessageController;
+use App\Http\Controllers\Guardian\FamilyRequestController as GuardianRequestController;
+use App\Http\Controllers\Educator\FamilyRequestController as EducatorRequestController;
+use App\Http\Controllers\Admin\FamilyRequestController as AdminRequestController;
+use App\Http\Controllers\Admin\SchoolYearController;
+use App\Http\Controllers\Admin\SubjectController;
+use App\Http\Controllers\Admin\ClassroomSubjectController;
+use App\Http\Controllers\Admin\PerformanceLevelController;
 use App\Http\Controllers\ForcePasswordController;
 use App\Http\Controllers\Admin\GuardianController;
 use App\Http\Controllers\Admin\ChildController as AdminChildController;
@@ -17,6 +31,7 @@ use App\Http\Controllers\Admin\ClassroomController;
 use App\Http\Controllers\Guardian\ChildController;
 use App\Http\Controllers\EnrollmentApplicationController;
 use App\Http\Controllers\Platform\SchoolController as PlatformSchoolController;
+use App\Http\Controllers\Platform\TwoFactorController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,11 +59,20 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->prefix('plataforma')
         ->name('platform.')
         ->group(function () {
-            Route::get('/colegios', [PlatformSchoolController::class, 'index'])->name('schools.index');
-            Route::get('/colegios/nuevo', [PlatformSchoolController::class, 'create'])->name('schools.create');
-            Route::post('/colegios', [PlatformSchoolController::class, 'store'])->name('schools.store');
-            Route::post('/colegios/{school}/suspender', [PlatformSchoolController::class, 'suspend'])->name('schools.suspend');
-            Route::post('/colegios/{school}/reactivar', [PlatformSchoolController::class, 'reactivate'])->name('schools.reactivate');
+            // Verificación en dos pasos: estas rutas quedan FUERA de 'two-factor' (si no, bucle infinito).
+            Route::get('/seguridad/activar', [TwoFactorController::class, 'setup'])->name('two-factor.setup');
+            Route::post('/seguridad/activar', [TwoFactorController::class, 'confirm'])->name('two-factor.confirm');
+            Route::get('/seguridad/codigo', [TwoFactorController::class, 'challenge'])->name('two-factor.challenge');
+            Route::post('/seguridad/codigo', [TwoFactorController::class, 'verify'])
+                ->middleware('throttle:5,1')->name('two-factor.verify'); // máximo 5 intentos por minuto
+
+            Route::middleware('two-factor')->group(function () {
+                Route::get('/colegios', [PlatformSchoolController::class, 'index'])->name('schools.index');
+                Route::get('/colegios/nuevo', [PlatformSchoolController::class, 'create'])->name('schools.create');
+                Route::post('/colegios', [PlatformSchoolController::class, 'store'])->name('schools.store');
+                Route::post('/colegios/{school}/suspender', [PlatformSchoolController::class, 'suspend'])->name('schools.suspend');
+                Route::post('/colegios/{school}/reactivar', [PlatformSchoolController::class, 'reactivate'])->name('schools.reactivate');
+            });
         });
 
 
@@ -83,6 +107,29 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             ->parameters(['familias' => 'guardian'])
             ->except(['show'])
             ->names('guardians');
+            // RF-02: año escolar y periodos.
+            Route::get('anio-escolar', [SchoolYearController::class, 'index'])->name('school-years.index');
+            Route::get('anio-escolar/nuevo', [SchoolYearController::class, 'create'])->name('school-years.create');
+            Route::post('anio-escolar', [SchoolYearController::class, 'store'])->name('school-years.store');
+            Route::get('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'edit'])->name('school-years.edit');
+            Route::put('anio-escolar/{schoolYear}/periodos', [SchoolYearController::class, 'update'])->name('school-years.update');
+            Route::post('anio-escolar/{schoolYear}/actual', [SchoolYearController::class, 'makeCurrent'])->name('school-years.current');
+
+            // RF-04 y RF-05: materias, dimensiones y escala de desempeños.
+            Route::get('materias', [SubjectController::class, 'index'])->name('subjects.index');
+            Route::post('materias', [SubjectController::class, 'store'])->name('subjects.store');
+            Route::patch('materias/{subject}', [SubjectController::class, 'update'])->name('subjects.update');
+            Route::post('materias/{subject}/activar', [SubjectController::class, 'toggle'])->name('subjects.toggle');
+            Route::get('grupos/{classroom}/materias', [ClassroomSubjectController::class, 'edit'])->name('classrooms.subjects');
+            Route::put('grupos/{classroom}/materias', [ClassroomSubjectController::class, 'update'])->name('classrooms.subjects.update');
+            Route::get('escala', [PerformanceLevelController::class, 'edit'])->name('performance.edit');
+            Route::put('escala', [PerformanceLevelController::class, 'update'])->name('performance.update');
+
+            // Fase 5: todas las solicitudes de las familias.
+            Route::get('solicitudes', [AdminRequestController::class, 'index'])->name('requests.index');
+            // RF-32: registro de las actividades hechas, con nota y fotos.
+            Route::get('registro-actividades', [AdminActivityRecordController::class, 'index'])->name('activity-records.index');            
+
             // RF-36: renovación de matrícula.
             Route::get('renovaciones', [AdminRenewalController::class, 'index'])->name('renewals.index');
             Route::post('renovaciones/abrir', [AdminRenewalController::class, 'open'])->name('renewals.open');
@@ -105,6 +152,13 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->prefix('docente')
         ->name('educator.')
         ->group(function () {
+            // Fase 5: el director atiende las solicitudes de las familias.
+            Route::post('/solicitudes/{familyRequest}/atender', [EducatorRequestController::class, 'handle'])->name('requests.handle');
+            // RF-27: bandeja de mensajes de las familias.
+            Route::get('/mensajes', [EducatorMessageController::class, 'index'])->name('messages.index');
+            Route::get('/mensajes/{conversation}', [EducatorMessageController::class, 'show'])->name('messages.show');
+            Route::post('/mensajes/{conversation}', [EducatorMessageController::class, 'store'])->name('messages.store');
+
             // La docente no tiene "Inicio": su pantalla principal es Bitácora.
             // El director de grupo empieza en la Bitácora; el docente solo por materia, en Grupos.
             Route::get('/', fn () => redirect()->route(
@@ -121,6 +175,14 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/grupos/{classroom}/asistencia', [GroupController::class, 'attendance'])->name('groups.attendance');
             Route::post('/grupos/{classroom}/asistencia', [GroupController::class, 'storeAttendance'])->name('groups.attendance.store');
 
+            // RF-07 y RF-08: notas (primaria) e informes de dimensiones (preescolar).
+            Route::get('/notas', [GradeController::class, 'index'])->name('grades.index');
+            Route::get('/notas/{classroom}/{subject}', [GradeController::class, 'show'])->name('grades.show');
+            Route::post('/notas/{classroom}/{subject}/actividades', [GradeController::class, 'storeAssessment'])->name('grades.assessments.store');
+            Route::delete('/notas/{classroom}/{subject}/actividades/{assessment}', [GradeController::class, 'destroyAssessment'])->name('grades.assessments.destroy');
+            Route::put('/notas/{classroom}/{subject}/planilla', [GradeController::class, 'saveScores'])->name('grades.scores');
+            Route::put('/notas/{classroom}/{subject}/informes', [GradeController::class, 'saveReports'])->name('grades.reports');
+
             // Avisos
             Route::get('/avisos/crear', [AnnouncementController::class, 'create'])->name('announcements.create');
             Route::post('/avisos', [AnnouncementController::class, 'store'])->name('announcements.store');
@@ -132,6 +194,10 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::get('/actividades/{activity}/editar', [\App\Http\Controllers\Educator\ActivityController::class, 'edit'])->name('activities.edit');
             Route::put('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'update'])->name('activities.update');
             Route::delete('/actividades/{activity}', [\App\Http\Controllers\Educator\ActivityController::class, 'destroy'])->name('activities.destroy');
+            // RF-32: registro de la actividad hecha (nota y fotos).
+            Route::get('/actividades/{activity}/registro', [ActivityRecordController::class, 'edit'])->name('activities.record');
+            Route::put('/actividades/{activity}/registro', [ActivityRecordController::class, 'update'])->name('activities.record.update');
+            Route::delete('/actividades/{activity}/fotos/{photo}', [ActivityRecordController::class, 'destroyPhoto'])->name('activities.photos.destroy');            
         });
 
     // Zona de familias
@@ -141,13 +207,30 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
         ->group(function () {
             Route::get('/', \App\Http\Controllers\Guardian\DashboardController::class)->name('dashboard');
             Route::get('/ninos/{child}', [ChildController::class, 'show'])->name('children.show');
+            Route::put('/ninos/{child}/autorizacion-imagen', [ChildController::class, 'imageConsent'])->name('children.image-consent');            
             Route::get('/ninos/{child}/bitacora', [GuardianReportController::class, 'index'])->name('reports.index');
             Route::get('/ninos/{child}/renovar', [GuardianRenewalController::class, 'create'])->name('renewals.create');
+            // Fase 5: solicitudes (excusa, permiso, recomendación).
+            Route::get('/solicitudes', [GuardianRequestController::class, 'index'])->name('requests.index');
+            Route::get('/ninos/{child}/solicitudes', [GuardianRequestController::class, 'child'])->name('requests.child');
+            Route::get('/ninos/{child}/solicitudes/nueva/{type}', [GuardianRequestController::class, 'create'])->name('requests.create');
+            Route::post('/ninos/{child}/solicitudes', [GuardianRequestController::class, 'store'])
+                ->middleware('throttle:10,1')->name('requests.store');
+            // RF-27: mensajes al director de grupo.
+            Route::get('/mensajes', [GuardianMessageController::class, 'index'])->name('messages.index');
+            Route::get('/mensajes/{child}', [GuardianMessageController::class, 'show'])->name('messages.show');
+            Route::post('/mensajes/{child}', [GuardianMessageController::class, 'store'])
+                ->middleware('throttle:10,1')->name('messages.store');
             Route::post('/ninos/{child}/renovar', [GuardianRenewalController::class, 'store'])->name('renewals.store');
             Route::get('/avisos', [GuardianAnnouncementController::class, 'index'])->name('announcements.index');
             Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
             Route::get('/actividades', [\App\Http\Controllers\Guardian\ActivityController::class, 'index'])->name('activities.index');
         });
+
+    // Planeación en PDF de una actividad: docente, coordinación y familias del grupo.
+    Route::get('/actividades/{activity}/planeacion', ActivityAttachmentController::class)->name('activities.attachment');   
+    // Fotos de una actividad: coordinación, docentes del grupo y familias que autorizaron.
+    Route::get('/actividades/{activity}/fotos/{photo}', ActivityPhotoController::class)->name('activities.photos.show');         
 
     // Perfil: lo comparten todos los roles
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

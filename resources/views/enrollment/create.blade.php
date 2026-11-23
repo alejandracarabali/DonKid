@@ -146,6 +146,16 @@
             </label>
             <x-input-error :messages="$errors->get('consent_data')" />
 
+            {{-- RF-67: uso de imagen. Opcional: no impide la matrícula. --}}
+            <label class="flex items-start gap-3">
+                <input type="checkbox" name="consent_image" value="1" @checked(old('consent_image'))
+                       class="mt-1 h-6 w-6 shrink-0 rounded border-2 border-line text-action focus:ring-action">
+                <span class="text-sm">
+                    Autorizo que el colegio tome fotos de mi hijo o hija en las actividades y las comparta solo con las familias
+                    de su grupo que también lo autorizaron. Es opcional y puedo retirar esta autorización cuando quiera desde la app.
+                </span>
+            </label>                
+
             <label class="flex items-start gap-3">
                 <input type="checkbox" name="consent_health" value="1" @checked(old('consent_health'))
                        @required(config('privacy.health_documents_required'))

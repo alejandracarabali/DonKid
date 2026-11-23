@@ -18,7 +18,7 @@
         </div>
 
         {{-- RF-53: retirar inhabilita al niño; su información no se borra. --}}
-        <div class="max-w-xl mx-auto mt-6 sm:px-6 lg:px-8 bg-white p-6 shadow-sm sm:rounded-lg">
+        <div id="retirar" class="max-w-xl mx-auto mt-6 sm:px-6 lg:px-8 bg-white p-6 shadow-sm sm:rounded-lg scroll-mt-6">
             <h3 class="font-semibold text-gray-800">Retirar de la institución</h3>
             <p class="mt-1 text-sm text-gray-600">
                 {{ $child->first_name }} dejará de aparecer en grupos, bitácora y avisos.

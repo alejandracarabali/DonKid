@@ -15,6 +15,25 @@
             @endforeach
         </section>
 
+        {{-- RF-02: periodo académico en curso. --}}
+        {{-- Bloque @php (no la forma corta): esta vista ya usa @php ... @endphp más abajo y mezclarlas rompe Blade. --}}
+        @php
+            $currentYear = \App\Models\SchoolYear::current()?->load('periods');
+        @endphp
+        <section class="card">
+            <h3 class="text-lg font-bold text-ink">Periodo académico</h3>
+            @if ($currentYear && ($currentPeriod = $currentYear->periodOn()))
+                <p class="mt-1"><strong>{{ $currentPeriod->name() }} {{ $currentYear->year }}</strong>
+                    · hasta el {{ $currentPeriod->ends_on->format('d/m/Y') }}</p>
+                <p class="text-sm text-soft">Notas hasta el {{ $currentPeriod->grades_due_on->format('d/m/Y') }}.</p>
+            @elseif ($currentYear)
+                <p class="mt-1 text-sm text-soft">Año {{ $currentYear->year }}: hoy no está dentro de ningún periodo (vacaciones).</p>
+            @else
+                <p class="mt-1 text-sm text-soft">Aún no hay año escolar.
+                    <a href="{{ route('admin.school-years.create') }}" class="font-semibold underline">Créalo</a>.</p>
+            @endif
+        </section>
+
         {{-- RF-34: enlace público para que las familias nuevas se inscriban. --}}
         @if ($school = auth()->user()->school)
             <section class="card">

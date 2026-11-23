@@ -13,6 +13,9 @@
             </div>
         @endif
 
+        {{-- Fase 5: solicitudes de familias pendientes (solo se muestra si hay). --}}
+        <x-family-requests />
+
         {{-- Grupos sin nivel: sus niños no aparecen aquí hasta que coordinación asigne el nivel. --}}
         @if ($groupsWithoutLevel->isNotEmpty())
             <div class="rounded-xl border-2 border-amber bg-amber/10 px-3 py-2" role="status">

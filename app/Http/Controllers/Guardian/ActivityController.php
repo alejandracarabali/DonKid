@@ -26,13 +26,19 @@ class ActivityController extends Controller
             ->pluck('children.classroom_id')
             ->unique();
 
-        $activities = Activity::with('classroom')
+        // RF-32: grupos donde esta familia puede ver fotos (tiene un hijo ahí CON autorización).
+        $photoClassroomIds = $request->user()->children()
+            ->whereNotNull('children.image_consent_at')
+            ->pluck('children.classroom_id')
+            ->unique();
+
+        $activities = Activity::with(['classroom', 'photos'])
             ->whereIn('classroom_id', $classroomIds)
             ->whereBetween('starts_at', [$start, $end])
             ->orderBy('starts_at')
             ->get()
             ->groupBy(fn (Activity $a) => $a->starts_at->toDateString());
 
-        return view('guardian.activities.index', compact('activities', 'start', 'end'));
+        return view('guardian.activities.index', compact('activities', 'start', 'end', 'photoClassroomIds'));
     }
 }

@@ -44,6 +44,12 @@ enum GradeLevel: string
         return $all[$i + 1] ?? null;
     }
 
+    // Lugar del nivel en el orden escolar: Párvulos = 0 ... Quinto = 8.
+    public function position(): int
+    {
+        return array_search($this, self::cases(), true);
+    }    
+
     /** @return list<self> */
     public static function preschool(): array
     {

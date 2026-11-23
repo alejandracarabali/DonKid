@@ -12,8 +12,6 @@
                 <span class="font-medium">
                     {{ $start->translatedFormat('j M') }} – {{ $end->translatedFormat('j M Y') }}
                 </span>
-                <a href="{{ route('guardian.activities.index', ['semana' => $start->copy()->addWeek()->toDateString()]) }}"
-                   class="px-3 py-1 border rounded hover:bg-gray-50">Siguiente →</a>
             </div>
 
             @forelse ($activities as $date => $items)
@@ -37,6 +35,38 @@
                                 @if ($activity->description)
                                     <p class="text-sm text-gray-700 mt-1">{{ $activity->description }}</p>
                                 @endif
+                                <x-activity-attachment :activity="$activity" />
+
+                                {{-- RF-32: lo que se hizo, con la nota de la docente y las fotos. --}}
+                                @if ($activity->isDone())
+                                    <div class="mt-2 rounded-xl bg-canvas p-3">
+                                        <p><span class="tag bg-ok-bg text-ok border border-ok">✓ Hecha</span></p>
+                                        @if ($activity->done_note)
+                                            <p class="mt-2">{{ $activity->done_note }}</p>
+                                        @endif
+
+                                        @if ($activity->photos->isNotEmpty())
+                                            @if ($photoClassroomIds->contains($activity->classroom_id))
+                                                <ul class="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                                    @foreach ($activity->photos as $photo)
+                                                        <li>
+                                                            <a href="{{ route('activities.photos.show', [$activity, $photo]) }}" target="_blank" rel="noopener">
+                                                                <img src="{{ route('activities.photos.show', [$activity, $photo]) }}"
+                                                                     alt="Foto {{ $loop->iteration }} de {{ $activity->title }}"
+                                                                     class="aspect-square w-full rounded-lg border-2 border-line object-cover" loading="lazy">
+                                                            </a>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            @else
+                                                <p class="mt-2 text-sm text-soft">
+                                                    Esta actividad tiene fotos. Para verlas,
+                                                    <a href="{{ route('guardian.dashboard') }}" class="font-bold text-action underline">autoriza el uso de imagen</a> de tu hijo.
+                                                </p>
+                                            @endif
+                                        @endif
+                                    </div>
+                                @endif                                
                             </li>
                         @endforeach
                     </ul>

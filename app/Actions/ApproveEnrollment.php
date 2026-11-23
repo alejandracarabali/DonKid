@@ -50,6 +50,15 @@ class ApproveEnrollment
             ]);
             $child->guardians()->attach($guardian->id, ['relationship' => $application->guardian_relationship]);
 
+
+            // RF-67: la respuesta del formulario pasa al niño. Dejar la casilla sin marcar también es una respuesta.
+            $child->forceFill([
+                'image_consent_at' => $application->image_consent_at,
+                'image_consent_by' => $application->image_consent_at ? $guardian->id : null,
+                'image_consent_ip' => $application->image_consent_at ? $application->consent_ip : null,
+                'image_consent_answered_at' => $application->created_at,
+            ])->save();            
+
             $application->forceFill([
                 'status' => EnrollmentStatus::Approved,
                 'child_id' => $child->id,

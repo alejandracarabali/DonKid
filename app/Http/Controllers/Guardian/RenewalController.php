@@ -64,6 +64,11 @@ class RenewalController extends Controller
                 'consent_policy_version' => config('privacy.policy_version'),
             ])->save();
 
+            // RF-67: la renovación también actualiza la autorización de imagen.
+            $request->boolean('consent_image')
+                ? $child->grantImageConsent($request->user(), $request->ip())
+                : $child->revokeImageConsent();            
+
             // La familia actualiza la ficha de salud de su hijo, solo si autorizó esos datos.
             if ($request->boolean('consent_health')) {
                 $child->healthRecord()->updateOrCreate([], $data['health'] ?? []);
