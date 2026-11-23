@@ -30,17 +30,19 @@
             </nav>
 
             @forelse ($applications as $application)
-                <a href="{{ route('admin.enrollments.show', $application) }}"
-                   class="mb-3 flex items-center justify-between rounded-lg bg-white p-4 shadow-sm hover:bg-canvas">
-                    <div>
-                        <p class="font-medium">{{ $application->child_first_name }} {{ $application->child_last_name }}</p>
+                <div class="mb-3 flex items-center justify-between gap-3 rounded-lg bg-white p-4 shadow-sm">
+                    <div class="min-w-0">
+                        <p class="truncate font-medium">{{ $application->child_first_name }} {{ $application->child_last_name }}</p>
                         <p class="text-sm text-gray-500">
                             {{ $application->reference() }} · {{ $application->desired_level?->label() }}
                             · Acudiente: {{ $application->guardian_name }} · {{ $application->created_at->format('d/m/Y') }}
                         </p>
                     </div>
-                    <span class="text-sm underline">Revisar</span>
-                </a>
+                    {{-- Las pendientes destacan en ámbar: son las que esperan una decisión. --}}
+                    <x-icon-button icon="eye" label="Revisar" :context="$application->child_first_name.' '.$application->child_last_name"
+                                   :variant="$application->status === \App\Enums\EnrollmentStatus::Pending ? 'primary' : 'default'"
+                                   :href="route('admin.enrollments.show', $application)" />
+                </div>
             @empty
                 <p class="text-gray-600">No hay solicitudes {{ mb_strtolower($status->label()) }}s.</p>
             @endforelse

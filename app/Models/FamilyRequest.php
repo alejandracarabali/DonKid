@@ -61,6 +61,29 @@ class FamilyRequest extends Model
         };
     }
 
+    // Tarjeta de solicitud: el "qué" en grande. "Cita médica", "Recoge otra persona"...
+    public function headline(): string
+    {
+        return match ($this->type) {
+            FamilyRequestType::Excuse => $this->reason,
+            FamilyRequestType::Permission => self::PERMISSION_KINDS[$this->reason] ?? 'Permiso',
+            FamilyRequestType::Recommendation => 'Para su cuidado',
+        };
+    }
+
+    // Tarjeta de solicitud: el dato que el docente necesita de un vistazo (o null si no hay).
+    public function highlight(): ?string
+    {
+        if ($this->type !== FamilyRequestType::Permission) {
+            return null;
+        }
+        $at = $this->time ? ' a las '.substr($this->time, 0, 5) : '';
+
+        return $this->isPickupByOther()
+            ? 'Recoge '.$this->pickup_name.' ('.mb_strtolower($this->pickup_relationship).')'.$at
+            : ($at ? 'Sale'.$at : null);
+    }
+
     protected function inheritedSchoolId(): ?int
     {
         return Child::withoutGlobalScopes()->whereKey($this->child_id)->value('school_id');

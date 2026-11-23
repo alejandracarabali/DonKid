@@ -30,7 +30,7 @@ class FamilyRequests extends Component
             ->when($user->role === Role::Educator, fn ($q) => $q->whereHas(
                 'child', fn ($c) => $c->whereIn('classroom_id', $user->ledClassrooms()->pluck('classrooms.id'))
             ))
-            ->with('child')
+            ->with(['child.classroom', 'guardian'])
             ->orderBy('date')
             ->get();
     }

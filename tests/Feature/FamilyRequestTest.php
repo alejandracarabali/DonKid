@@ -108,7 +108,7 @@ it('el director ve el bloque en la Bitácora y confirma el permiso', function ()
     $this->actingAs($director)->get(route('educator.reports.index'))
         ->assertSee('Solicitudes de familias')
         ->assertSee('Recoge Carlos Ríos')
-        ->assertSee('Código '.$solicitud->pickup_code)
+        ->assertSeeInOrder(['Código de recogida', $solicitud->pickup_code])
         ->assertSee('Confirmar');
 
     $this->actingAs($director)->post(route('educator.requests.handle', $solicitud))->assertRedirect();
@@ -170,10 +170,10 @@ it('coordinación ve todas las solicitudes y las filtra', function () {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)->get(route('admin.requests.index'))
-        ->assertOk()->assertSee('Recomendación')->assertSee('Excusa: Enfermedad');
+        ->assertOk()->assertSee('Recomendación')->assertSeeInOrder(['Excusa', 'Enfermedad']);
 
     $this->actingAs($admin)->get(route('admin.requests.index', ['tipo' => 'excuse']))
-        ->assertSee('Excusa: Enfermedad')->assertDontSee('Tos');
+        ->assertSee('Enfermedad')->assertDontSee('Tos');
 });
 
 it('la familia tiene Solicitudes en su menú', function () {
@@ -197,4 +197,19 @@ it('responde 404 con un tipo de solicitud inventado', function () {
     [$madre, $nino] = requestSetup();
 
     $this->actingAs($madre)->get(route('guardian.requests.create', [$nino, 'inventado']))->assertNotFound();
+});
+
+it('la tarjeta resalta el dato clave de cada permiso', function () {
+    $pickup = new FamilyRequest(['reason' => 'other_person', 'pickup_name' => 'Carlos Ríos', 'pickup_relationship' => 'Tío/a', 'time' => '15:30:00']);
+    $pickup->type = \App\Enums\FamilyRequestType::Permission;
+    $exit = new FamilyRequest(['reason' => 'early_exit', 'time' => '11:00']);
+    $exit->type = \App\Enums\FamilyRequestType::Permission;
+    $excuse = new FamilyRequest(['reason' => 'Cita médica']);
+    $excuse->type = \App\Enums\FamilyRequestType::Excuse;
+
+    expect($pickup->highlight())->toBe('Recoge Carlos Ríos (tío/a) a las 15:30')
+        ->and($pickup->headline())->toBe('Recoge otra persona')
+        ->and($exit->highlight())->toBe('Sale a las 11:00')
+        ->and($excuse->highlight())->toBeNull()
+        ->and($excuse->headline())->toBe('Cita médica');
 });
