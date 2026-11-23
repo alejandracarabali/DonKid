@@ -130,3 +130,33 @@ it('la familia ve la nota siempre, y las fotos solo si autorizó', function () {
     $child->forceFill(['image_consent_at' => now()])->save();
     $this->get($week)->assertSee($photoUrl);
 });
+
+it('coordinación ve el registro con resumen y filtros', function () {
+    [$classroom, $educator, $activity] = recordSetup();
+    $this->actingAs($educator)->put(route('educator.activities.record.update', $activity), ['done_note' => 'Mural colectivo', 'photos' => [photo()]]);
+
+    $other = new Activity(['title' => 'Cuento leído', 'starts_at' => now(), 'ends_at' => now()->addHour()]);
+    $other->classroom_id = Classroom::factory()->create()->id;
+    $other->forceFill(['done_at' => now()])->save();
+
+    $pending = new Activity(['title' => 'Aún no se hace', 'starts_at' => now(), 'ends_at' => now()->addHour()]);
+    $pending->classroom_id = $classroom->id;
+    $pending->save();
+
+    $admin = User::factory()->admin()->create();
+    $this->actingAs($admin)->get(route('admin.activity-records.index'))
+        ->assertOk()
+        ->assertSee('Mural colectivo')->assertSee('Cuento leído')->assertDontSee('Aún no se hace')
+        ->assertSee('Sin nota de registro')
+        ->assertSeeInOrder(['Hechas', '2', 'Con fotos', '1', 'Grupos', '2']);
+
+    $this->get(route('admin.activity-records.index', ['grupo' => $classroom->id]))
+        ->assertSee('Mural colectivo')->assertDontSee('Cuento leído');
+
+    $this->get(route('activities.photos.show', [$activity, $activity->photos()->first()]))->assertOk();
+});
+
+it('docentes y familias no entran al registro de coordinación', function (string $role) {
+    $this->actingAs(User::factory()->{$role}()->create())
+        ->get(route('admin.activity-records.index'))->assertForbidden();
+})->with(['educator', 'guardian']);
