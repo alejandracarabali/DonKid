@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ActivityAttachmentController;
 use App\Http\Controllers\Educator\GroupController;
 use App\Http\Controllers\Educator\GradeController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -215,6 +216,9 @@ Route::middleware(['auth', 'password.changed', 'school.active', 'guardian.active
             Route::post('/avisos/{announcement}/leido', [GuardianAnnouncementController::class, 'read'])->name('announcements.read');
             Route::get('/actividades', [\App\Http\Controllers\Guardian\ActivityController::class, 'index'])->name('activities.index');
         });
+
+    // Planeación en PDF de una actividad: docente, coordinación y familias del grupo.
+    Route::get('/actividades/{activity}/planeacion', ActivityAttachmentController::class)->name('activities.attachment');        
 
     // Perfil: lo comparten todos los roles
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Educator;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ActivityRequest;
 use App\Models\Activity;
@@ -70,6 +72,7 @@ class ActivityController extends Controller
         $activity = new Activity($request->safe()->only(['title', 'description', 'starts_at', 'ends_at']));
         $activity->classroom_id = $classroom->id;
         $activity->author_id = $request->user()->id;
+        $this->syncAttachment($request, $activity);
         $activity->save();
 
         return redirect()->route('educator.activities.index')
@@ -88,17 +91,49 @@ class ActivityController extends Controller
         Gate::authorize('update', $activity);
 
         // El grupo no se cambia al editar: la actividad sigue en su grupo.
-        $activity->update($request->safe()->only(['title', 'description', 'starts_at', 'ends_at']));
+        $activity->fill($request->safe()->only(['title', 'description', 'starts_at', 'ends_at']));
+        $replaced = $this->syncAttachment($request, $activity);
+        $activity->save();
+        $this->deleteFile($replaced); // el PDF anterior se borra solo después de guardar
 
         return redirect()->route('educator.activities.index')
             ->with('status', 'Actividad actualizada.');
     }
+
+    /**
+     * Planeación en PDF: guarda el nuevo o lo quita.
+     * Va al disco privado 'local' con nombre aleatorio; nunca a public/.
+     * Devuelve la ruta del PDF anterior que ya no se usa (para borrarlo), o null.
+     */
+    private function syncAttachment(ActivityRequest $request, Activity $activity): ?string
+    {
+        $old = $activity->attachment_path;
+
+        if ($request->hasFile('attachment')) {
+            $file = $request->file('attachment');
+            $activity->attachment_path = $file->storeAs('actividades', Str::uuid().'.pdf', 'local');
+            $activity->attachment_name = Str::limit($file->getClientOriginalName(), 195);
+        } elseif ($request->boolean('remove_attachment')) {
+            $activity->attachment_path = null;
+            $activity->attachment_name = null;
+        }
+
+        return $old !== $activity->attachment_path ? $old : null;
+    }
+
+    private function deleteFile(?string $path): void
+    {
+        if ($path) {
+            Storage::disk('local')->delete($path);
+        }
+    }    
 
     public function destroy(Activity $activity): RedirectResponse
     {
         Gate::authorize('delete', $activity);
 
         $activity->delete();
+        $this->deleteFile($activity->attachment_path);        
 
         return redirect()->route('educator.activities.index')
             ->with('status', 'Actividad eliminada.');

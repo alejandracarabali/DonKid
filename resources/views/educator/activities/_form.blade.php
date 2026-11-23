@@ -32,6 +32,26 @@
     <x-input-error :messages="$errors->get('description')" class="mt-2" />
 </div>
 
+<div>
+    <x-input-label for="attachment" value="Planeación en PDF (opcional)" />
+    <input id="attachment" name="attachment" type="file" accept="application/pdf"
+           class="mt-1 block w-full text-sm">
+    <p class="mt-1 text-sm text-gray-500">Máximo 10 MB. Las familias del grupo lo podrán descargar.</p>
+
+    @if (isset($activity) && $activity->attachment_path)
+        <p class="mt-2 text-sm">
+            Archivo actual: <a href="{{ route('activities.attachment', $activity) }}" class="font-bold underline">{{ $activity->attachment_name }}</a>.
+            Si subes otro, reemplaza a este.
+        </p>
+        <label class="mt-1 inline-flex items-center gap-2 text-sm">
+            <input type="checkbox" name="remove_attachment" value="1">
+            Quitar el PDF
+        </label>
+    @endif
+
+    <x-input-error :messages="$errors->get('attachment')" class="mt-2" />
+</div>
+
 <div class="grid sm:grid-cols-2 gap-4">
     <div>
         <x-input-label for="starts_at" value="Empieza" />
